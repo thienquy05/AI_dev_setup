@@ -1,0 +1,16 @@
+{
+  "model": "opus",
+  "effortLevel": "high",
+  "enabledPlugins": {
+    "ponytail@ponytail": true,
+    "code-review@claude-plugins-official": true,
+    "codex@openai-codex": true
+  },
+  "extraKnownMarketplaces": {
+    "ponytail": { "source": { "source": "github", "repo": "DietrichGebert/ponytail" } },
+    "anthropic-agent-skills": { "source": { "source": "github", "repo": "anthropics/skills" } },
+    "ecc": { "source": { "source": "github", "repo": "affaan-m/ECC" } },
+    "openai-codex": { "source": { "source": "github", "repo": "openai/codex-plugin-cc" } }
+  },
+  "sandbox": { "excludedCommands": ["codex"] }
+}

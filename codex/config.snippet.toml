@@ -1,0 +1,36 @@
+# Manual alternative to `codex mcp add`. Append to ~/.codex/config.toml
+# (shared by the Codex app, CLI and IDE extension).
+
+[mcp_servers.context7]
+command = "npx"
+args = ["-y", "@upstash/context7-mcp@latest"]
+
+[mcp_servers.sequential-thinking]
+command = "npx"
+args = ["-y", "@modelcontextprotocol/server-sequential-thinking"]
+
+[mcp_servers.memory]
+command = "npx"
+args = ["-y", "@modelcontextprotocol/server-memory"]
+
+[mcp_servers.playwright]
+command = "npx"
+args = ["-y", "@playwright/mcp", "--browser", "chrome"]
+
+[mcp_servers.magic]
+command = "npx"
+args = ["-y", "@magicuidesign/mcp@latest"]
+
+[mcp_servers.pdf]
+command = "npx"
+args = ["-y", "@modelcontextprotocol/server-pdf", "--stdio"]
+
+[mcp_servers.github]
+command = "npx"
+args = ["-y", "@modelcontextprotocol/server-github"]
+[mcp_servers.github.env]
+GITHUB_PERSONAL_ACCESS_TOKEN = "REPLACE_ME"   # or create via: codex mcp add github --env ...
+
+# Remote OAuth connectors (then run: codex mcp login <name>)
+[mcp_servers.vercel]
+url = "https://mcp.vercel.com"
