@@ -15,6 +15,7 @@ ALL_CATEGORIES="dev design video audio docs productivity jobs learning finance a
 #   cmarket : Codex plugin marketplace                 value = GitHub owner/repo
 #   cplugin : plugin installed from a Codex marketplace name = plugin@marketplace
 #   cmcp    : MCP server for Codex only (Claude gets it from a plugin)  value = command line
+#   agentskill : skill pack installed with the `skills` CLI into Claude Code and/or Codex (user scope)   value = GitHub owner/repo
 #   cskill  : skill installed for Codex into ~/.agents/skills/<name>   value = install command
 #   remote  : remote OAuth MCP server (Codex only,     value = URL
 #             --connectors; Claude gets these from your claude.ai account)
@@ -46,6 +47,7 @@ design|market|ui-ux-pro-max-skill|nextlevelbuilder/ui-ux-pro-max-skill
 design|plugin|ui-ux-pro-max@ui-ux-pro-max-skill|
 design|cskill|ui-ux-pro-max|npx -y ui-ux-pro-max-cli init --ai universal --global
 design|remote|excalidraw|https://mcp.excalidraw.com/mcp
+video|agentskill|remotion|remotion-dev/skills
 audio|remote|elevenlabs|https://api.elevenlabs.io/v1/mcp
 docs|mcp|pdf|npx -y @modelcontextprotocol/server-pdf --stdio
 docs|remote|claude-docs|https://api.anthropic.com/v1/pages/mcp
@@ -98,7 +100,7 @@ Extras
   -h, --help
 
 Env: GITHUB_PERSONAL_ACCESS_TOKEN enables the github MCP server (dev category).
-Categories without installer entries (video, finance) are account-synced: see README.md.
+Categories without installer entries (finance) are account-synced: see README.md.
 USAGE
 }
 
@@ -268,8 +270,24 @@ codex_setup() {
   return 0
 }
 
+# Skill packs installed with the `skills` CLI (needs Node 22.20+). One call targets whichever tools are selected.
+skillpacks_setup() {
+  [ "$DO_PLUGINS" = 1 ] || return 0
+  local sname srepo agents=""
+  [ "$DO_CLAUDE" = 1 ] && agents="$agents -a claude-code"
+  [ "$DO_CODEX" = 1 ] && agents="$agents -a codex"
+  while IFS='|' read -r sname srepo; do
+    [ -z "$sname" ] && continue
+    say "Skill pack: $sname ($srepo)"
+    have npx || { echo "npx missing" >&2; FAILED+=("skill pack $sname (npx missing)"); continue; }
+    # shellcheck disable=SC2086
+    run npx -y skills add "$srepo" -g $agents -s '*' -y
+  done < <(entries agentskill)
+}
+
 [ "$DO_CLAUDE" = 1 ] && claude_setup
 [ "$DO_CODEX" = 1 ] && codex_setup
+skillpacks_setup
 
 say "Done"
 if [ "${#FAILED[@]}" -gt 0 ]; then

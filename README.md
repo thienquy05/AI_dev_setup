@@ -19,10 +19,11 @@ export GITHUB_PERSONAL_ACCESS_TOKEN=ghp_xxx   # optional, enables the github MCP
 6. [Manual commands](#6-manual-commands)
 7. [Configuration files](#7-configuration-files)
 8. [Shared AGENTS.md](#8-shared-agentsmd)
-9. [Account-synced items](#9-account-synced-items)
-10. [Excluded items](#10-excluded-items)
-11. [Troubleshooting](#11-troubleshooting)
-12. [Maintenance](#12-maintenance)
+9. [Optional apps](#9-optional-apps)
+10. [Account-synced items](#10-account-synced-items)
+11. [Excluded items](#11-excluded-items)
+12. [Troubleshooting](#12-troubleshooting)
+13. [Maintenance](#13-maintenance)
 
 ## 1. Requirements
 
@@ -33,6 +34,7 @@ export GITHUB_PERSONAL_ACCESS_TOKEN=ghp_xxx   # optional, enables the github MCP
 | Codex CLI | `codex plugin`, `codex mcp` (the Codex app and IDE extension read the same `~/.codex/config.toml`) | `npm install -g @openai/codex`, then `codex login` |
 | Google Chrome | `playwright` MCP (`--browser chrome`) | `brew install --cask google-chrome` |
 | GitHub token (optional) | `github` MCP | https://github.com/settings/tokens |
+| Node.js 22.20+ | `skills` CLI used for the Remotion skill pack | `brew install node` |
 | Claude Code 2.1.287+ | `agents` category (ruflo mods) | `claude update` |
 | Python 3 | `ui-ux-pro-max` search scripts | `brew install python` |
 | ffmpeg, yt-dlp (video category) | `ffmpeg-llm`, `watch-video` | `brew install ffmpeg yt-dlp` |
@@ -71,7 +73,7 @@ After installing:
 
 ## 4. Categories
 
-Installer column: **script** = installed by `install.sh`; **account** = synced from the claude.ai account (see [section 9](#9-account-synced-items)).
+Installer column: **script** = installed by `install.sh`; **account** = synced from the claude.ai account (see [section 10](#10-account-synced-items)).
 
 ### core (always installed)
 
@@ -111,11 +113,12 @@ Installer column: **script** = installed by `install.sh`; **account** = synced f
 
 | Tool | Type | Installer | Purpose |
 |---|---|---|---|
+| remotion | skill pack, [remotion-dev/skills](https://github.com/remotion-dev/skills) for [remotion-dev/remotion](https://github.com/remotion-dev/remotion) | script (Claude Code + Codex, user scope) | Remotion creates videos from React code: compositions are React components, previewed in Remotion Studio and rendered to video or images (locally, Lambda, Vercel); also usable for batch rendering and embedded video editors. The skills teach the agent the workflow: `/remotion-create`, `/remotion-markup`, `/remotion-studio`, `/remotion-render`, `/remotion-docs`, `/remotion-best-practices`, plus captions, maps and Mediabunny. Start a project with `npx create-video@latest`. **License:** free for individuals, for-profit companies with up to 3 employees, non-profits and evaluation; larger for-profit companies need a company license (remotion.pro: Creators $25 per seat per month; Automators $0.01 per render, $100 per month minimum; Enterprise from $500 per month). Rendering on AWS Lambda or Vercel is billed by those providers. Terms change in Remotion 5.0; check https://remotion.dev/license. |
 | ffmpeg-llm | plugin | account | `/ffmpeg`: FFmpeg command from a plain-language description; `ffmpeg-expert` agent for failed commands, encoder tuning and filtergraphs. Requires `ffmpeg`. |
 | watch-video | plugin | account | Analyzes a video (local file, URL via yt-dlp, Jira attachment): extracts keyframes with ffmpeg and transcribes audio with faster-whisper. |
 | video-to-code-skill | plugin (v1.3) | account | Listed in `claude plugin list`; no description was available when this repo was written. |
 
-No script installer exists for this category. `./install.sh --video` installs core only; install `ffmpeg` and `yt-dlp` (section 1) and sign in to claude.ai so the plugins sync.
+`./install.sh --video` installs the Remotion skill pack. The other three entries are account-synced: install `ffmpeg` and `yt-dlp` (section 1) and sign in to claude.ai so they sync.
 
 ### audio (`--audio`)
 
@@ -193,7 +196,7 @@ Codex-only install: `./install.sh --codex` (add `--with-connectors` for remote s
 | core | ponytail, ECC, context7, sequential-thinking, memory, shared `AGENTS.md` | `code-review` (Codex has built-in `/review`), `codex` bridge plugin (Claude Code only), account-synced plugins |
 | dev | playwright, chrome-devtools, token-optimizer, github (with token); vercel via `--with-connectors` | `engineering` plugin |
 | design | magic, ui-ux-pro-max skill; excalidraw via `--with-connectors` | `design` plugin |
-| video | none | `ffmpeg-llm`, `watch-video`, `video-to-code-skill` (claude.ai account only) |
+| video | remotion skill pack | `ffmpeg-llm`, `watch-video`, `video-to-code-skill` (claude.ai account only) |
 | audio | elevenlabs via `--with-connectors` | `transcribe-so` plugin |
 | docs | pdf; claude-docs, google-drive, goodnotes via `--with-connectors` | `pdf-viewer`, Anthropic built-in skills |
 | productivity, jobs, learning | all remote servers via `--with-connectors` | none |
@@ -229,6 +232,9 @@ claude mcp add --scope user github -e GITHUB_PERSONAL_ACCESS_TOKEN=ghp_xxx -- np
 claude mcp add --scope user magic -- npx -y @magicuidesign/mcp@latest
 claude plugin marketplace add nextlevelbuilder/ui-ux-pro-max-skill
 claude plugin install ui-ux-pro-max@ui-ux-pro-max-skill --scope user
+
+# video
+npx -y skills add remotion-dev/skills -g -a claude-code -s '*' -y
 
 # docs
 claude mcp add --scope user pdf -- npx -y @modelcontextprotocol/server-pdf --stdio
@@ -278,6 +284,9 @@ codex mcp add ruflo -- npx -y ruflo@latest mcp start
 # security
 codex mcp add rea -- npx -y rea-agents@6.5.0 mcp
 
+# video
+npx -y skills add remotion-dev/skills -g -a codex -s '*' -y
+
 # docs
 codex mcp add pdf -- npx -y @modelcontextprotocol/server-pdf --stdio
 
@@ -317,7 +326,25 @@ Not copied: `permissions.allow` (project-specific paths) and `statusLine` (hard-
 - Edit `shared/AGENTS.md`, then run `./install.sh --config-only` to redeploy.
 - Per-project override: add `AGENTS.md` to the repository (Codex) and a `CLAUDE.md` containing `@AGENTS.md` (Claude Code).
 
-## 9. Account-synced items
+## 9. Optional apps
+
+Applications that are not plugins or MCP servers and are installed by hand.
+
+### Harp (macOS terminal for multiple agents)
+
+[dominikmartn/harp](https://github.com/dominikmartn/harp): unofficial fork of the open-source Warp terminal with a sidebar for running several Claude Code and Codex sessions at once.
+
+| Item | Detail |
+|---|---|
+| Shows | Per-session state (working, waiting for you, done, background work, set aside), named tab groups, and two usage rings per provider (5-hour and weekly limits) |
+| Install | Download `Harp-<version>.dmg` from the repo's Releases page and drag to Applications; or build from source: `./script/bootstrap && ./script/run` (Rust toolchain) |
+| Settings | `~/.harp/settings.toml` (tmux sync, limit-ring file, menu options); runs next to Warp with its own bundle id and settings folder |
+| Claude Code integration | On first start, if `~/.claude/settings.json` has no `statusLine`, Harp adds one that writes `~/.harp/claude-statusline.json`. An existing `statusLine` is left unchanged; to keep it and get the rings, pipe through `tee ~/.harp/claude-statusline.json \| your-command`. Rings work for Claude.ai plans, not API keys. |
+| Codex integration | Limit rings read `~/.codex/sessions` |
+| Cost | Free; AGPL-3.0 (the `warpui` crates are MIT). Warp's own AI and cloud features, if used, talk to Warp's servers under Warp's terms; Harp adds no servers. Logging in through Harp is untested upstream. |
+| Platform | macOS only |
+
+## 10. Account-synced items
 
 Plugins and connectors marked **account** sync when Claude Code is signed in to the same claude.ai account. They cannot be installed from a repository.
 
@@ -326,7 +353,7 @@ Plugins and connectors marked **account** sync when Claude Code is signed in to 
 - Plugin-bundled MCP entries (`plugin:engineering:*`, `plugin:design:*`, `plugin:finance:*`) show "Needs authentication" until authorized in Claude Code. Asana reports "does not support dynamic client registration"; this is a server limitation.
 - Remote connector URLs were taken from Claude Code. Authorization from Codex is not guaranteed for every server (some are issued for claude.ai only); a failure is reported at the end of the run and does not stop other steps.
 
-## 10. Excluded items
+## 11. Excluded items
 
 | Item | Reason |
 |---|---|
@@ -334,7 +361,7 @@ Plugins and connectors marked **account** sync when Claude Code is signed in to 
 | harness-os | Docker MCP bound to local `~/Project/harness_os` and a local Postgres (`DATABASE_URL` in its command). |
 | `permissions.allow`, per-project paths | Project-specific. |
 
-## 11. Troubleshooting
+## 12. Troubleshooting
 
 | Symptom | Action |
 |---|---|
@@ -347,7 +374,7 @@ Plugins and connectors marked **account** sync when Claude Code is signed in to 
 | ECC duplicated skills or hooks | Follow "Reset / Uninstall ECC" in the ECC README; do not mix plugin and manual installs. |
 | Restore previous config | `~/.claude/settings.json.bak`, `~/.codex/AGENTS.md.bak`. |
 
-## 12. Maintenance
+## 13. Maintenance
 
 1. Capture the current state: `claude plugin marketplace list`, `claude plugin list`, `claude mcp list`, `codex mcp list`, `cat ~/.codex/config.toml`.
 2. Add new items as a row in the `CATALOGUE` block of `install.sh` (`category|type|name|value`).
