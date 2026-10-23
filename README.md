@@ -130,7 +130,7 @@ Installer column: **script** = installed by `install.sh`; **account** = synced f
 
 | Tool | Type | Installer | Purpose |
 |---|---|---|---|
-| pdf | MCP, `@modelcontextprotocol/server-pdf --stdio` | script | Open and read PDFs. |
+| pdf | MCP, `@modelcontextprotocol/server-pdf --stdio` | Codex: script; Claude Code: provided by the `pdf-viewer` plugin (same server, so it is not added twice) | Open and read PDFs. |
 | pdf-viewer | plugin | account | Interactive PDF viewer: annotate, fill forms, sign. |
 | claude-docs | remote MCP, `https://api.anthropic.com/v1/pages/mcp` | account (Claude Code), script `--with-connectors` (Codex) | Create and edit shareable docs. |
 | google-drive | remote MCP, `https://drivemcp.googleapis.com/mcp/v1` | account / `--with-connectors` | Search and read Drive files. |
@@ -198,9 +198,6 @@ claude plugin install ui-ux-pro-max@ui-ux-pro-max-skill --scope user
 
 # video
 npx -y skills add remotion-dev/skills -g -a claude-code -s '*' -y
-
-# docs
-claude mcp add --scope user pdf -- npx -y @modelcontextprotocol/server-pdf --stdio
 
 # agents
 claude plugin marketplace add ruvnet/ruflo

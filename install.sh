@@ -49,7 +49,7 @@ design|cskill|ui-ux-pro-max|npx -y ui-ux-pro-max-cli init --ai universal --globa
 design|remote|excalidraw|https://mcp.excalidraw.com/mcp
 video|agentskill|remotion|remotion-dev/skills
 audio|remote|elevenlabs|https://api.elevenlabs.io/v1/mcp
-docs|mcp|pdf|npx -y @modelcontextprotocol/server-pdf --stdio
+docs|cmcp|pdf|npx -y @modelcontextprotocol/server-pdf --stdio
 docs|remote|claude-docs|https://api.anthropic.com/v1/pages/mcp
 docs|remote|google-drive|https://drivemcp.googleapis.com/mcp/v1
 docs|remote|goodnotes|https://claude-mcp-api.ml.goodnotes.com/mcp
