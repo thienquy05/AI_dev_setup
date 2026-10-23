@@ -1,53 +1,112 @@
 #!/usr/bin/env bash
-# One-shot setup for Claude Code + Codex (plugins, MCP servers, settings, shared AGENTS.md).
-# Safe to re-run: anything already installed is skipped.
+# Category-based setup for Claude Code + Codex (plugins, MCP servers, settings, shared AGENTS.md).
+# Idempotent: anything already installed is skipped. Compatible with macOS bash 3.2.
 set -uo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+ALL_CATEGORIES="dev design video audio docs productivity jobs learning finance"
+
+# ---------------------------------------------------------------------------
+# Catalogue. One entry per line:  category|type|name|value
+#   market  : Claude/Codex plugin marketplace          value = GitHub owner/repo
+#   plugin  : plugin installed from a marketplace      name  = plugin@marketplace
+#   mcp     : local stdio MCP server (Claude + Codex)  value = command line
+#   remote  : remote OAuth MCP server (Codex only,     value = URL
+#             --connectors; Claude gets these from your claude.ai account)
+# Items with no installer (account-synced plugins/connectors) are documented in README.md.
+# ---------------------------------------------------------------------------
+CATALOGUE='
+core|market|ponytail|DietrichGebert/ponytail
+core|market|claude-plugins-official|anthropics/claude-plugins-official
+core|market|anthropic-agent-skills|anthropics/skills
+core|market|openai-codex|openai/codex-plugin-cc
+core|plugin|ponytail@ponytail|
+core|plugin|code-review@claude-plugins-official|
+core|plugin|codex@openai-codex|
+core|mcp|context7|npx -y @upstash/context7-mcp@latest
+core|mcp|sequential-thinking|npx -y @modelcontextprotocol/server-sequential-thinking
+core|mcp|memory|npx -y @modelcontextprotocol/server-memory
+dev|mcp|playwright|npx -y @playwright/mcp --browser chrome
+dev|remote|vercel|https://mcp.vercel.com
+design|mcp|magic|npx -y @magicuidesign/mcp@latest
+design|remote|excalidraw|https://mcp.excalidraw.com/mcp
+audio|remote|elevenlabs|https://api.elevenlabs.io/v1/mcp
+docs|mcp|pdf|npx -y @modelcontextprotocol/server-pdf --stdio
+docs|remote|claude-docs|https://api.anthropic.com/v1/pages/mcp
+docs|remote|google-drive|https://drivemcp.googleapis.com/mcp/v1
+docs|remote|goodnotes|https://claude-mcp-api.ml.goodnotes.com/mcp
+productivity|remote|gmail|https://gmailmcp.googleapis.com/mcp/v1
+productivity|remote|google-calendar|https://calendarmcp.googleapis.com/mcp/v1
+productivity|remote|slack|https://mcp.slack.com/mcp
+productivity|remote|agentmail|https://mcp.agentmail.to/mcp
+jobs|remote|indeed|https://mcp.indeed.com/claude/mcp
+jobs|remote|dice|https://mcp.dice.com/mcp
+jobs|remote|ziprecruiter|https://api.ziprecruiter.com/mcp
+jobs|remote|jobdatalake|https://mcp.jobdatalake.com
+jobs|remote|jobs-and-careers|https://jobs-and-careers-gpt-app.sonicapply.com/mcp
+learning|remote|coursera|https://api.coursera.com/mcp
+'
+# ECC (opt-in, --with-ecc)
+ECC_MARKET="affaan-m/ECC"
+
 DO_CLAUDE=1; DO_CODEX=1
 DO_PLUGINS=1; DO_MCP=1; DO_CONFIG=1
 WITH_ECC=0; WITH_CONNECTORS=0; DRY=0
+SELECTED=""   # empty = all categories
 
 usage() {
-  cat <<'USAGE'
+  cat <<USAGE
 Usage: ./install.sh [options]
 
 Targets (default: both)
-  --claude            only set up Claude Code
-  --codex             only set up Codex (app, CLI and IDE share the same config)
+  --claude              set up Claude Code only
+  --codex               set up Codex only (app, CLI and IDE extension share ~/.codex/config.toml)
+
+Categories (default: core + every category). Passing any category flag installs core + only those.
+  --dev --design --video --audio --docs --productivity --jobs --learning --finance
+  --list                print the catalogue per category and exit
 
 Parts (default: all)
-  --plugins-only      only plugins/marketplaces
-  --mcp-only          only MCP servers
-  --config-only       only settings.json merge + AGENTS.md
+  --plugins-only        plugins/marketplaces only
+  --mcp-only            MCP servers only
+  --config-only         settings.json merge + AGENTS.md only
 
-Extras (off by default)
-  --with-ecc          also install Everything Claude Code (ecc@ecc)
-  --with-connectors   also add remote OAuth connectors (Gmail, Drive, Calendar, Slack, Vercel, Excalidraw) to Codex
+Extras
+  --with-ecc            install Everything Claude Code (ecc@ecc)
+  --with-connectors     add remote OAuth connectors of the selected categories to Codex
+  --dry-run             print commands, change nothing
+  -h, --help
 
-Other
-  --dry-run           print what would run, change nothing
-  -h, --help          this help
-
-Optional env: GITHUB_PERSONAL_ACCESS_TOKEN (enables the github MCP server)
+Env: GITHUB_PERSONAL_ACCESS_TOKEN enables the github MCP server (dev category).
+Categories without installer entries (video, finance) are account-synced: see README.md.
 USAGE
 }
+
+add_cat() { case " $SELECTED " in *" $1 "*) ;; *) SELECTED="$SELECTED $1" ;; esac; }
 
 for a in "$@"; do
   case "$a" in
     --claude) DO_CODEX=0 ;;
     --codex) DO_CLAUDE=0 ;;
+    --dev|--design|--video|--audio|--docs|--productivity|--jobs|--learning|--finance) add_cat "${a#--}" ;;
     --plugins-only) DO_MCP=0; DO_CONFIG=0 ;;
     --mcp-only) DO_PLUGINS=0; DO_CONFIG=0 ;;
     --config-only) DO_PLUGINS=0; DO_MCP=0 ;;
     --with-ecc) WITH_ECC=1 ;;
     --with-connectors) WITH_CONNECTORS=1 ;;
     --dry-run) DRY=1 ;;
+    --list)
+      for c in core $ALL_CATEGORIES; do
+        echo "[$c]"; echo "$CATALOGUE" | awk -F'|' -v c="$c" '$1==c && $2!="market" {printf "  %-7s %s %s\n",$2,$3,$4}'
+      done
+      exit 0 ;;
     -h|--help) usage; exit 0 ;;
     *) echo "Unknown option: $a" >&2; usage; exit 1 ;;
   esac
 done
+[ -z "$SELECTED" ] && SELECTED="$ALL_CATEGORIES"
+SELECTED="core $SELECTED"
 
 FAILED=()
 say() { printf '\n\033[1m==> %s\033[0m\n' "$*"; }
@@ -58,67 +117,68 @@ run() {
 }
 have() { command -v "$1" >/dev/null 2>&1; }
 
-# ---------- MCP server catalogue (name | command...) ----------
-# stdio servers launched with npx. Format: "name::command arg arg"
-MCP_SERVERS=(
-  "context7::npx -y @upstash/context7-mcp@latest"
-  "sequential-thinking::npx -y @modelcontextprotocol/server-sequential-thinking"
-  "memory::npx -y @modelcontextprotocol/server-memory"
-  "playwright::npx -y @playwright/mcp --browser chrome"
-  "magic::npx -y @magicuidesign/mcp@latest"
-  "pdf::npx -y @modelcontextprotocol/server-pdf --stdio"
-)
-# name|url — remote OAuth servers (Codex only; Claude gets these from your claude.ai account)
-CONNECTORS=(
-  "gmail|https://gmailmcp.googleapis.com/mcp/v1"
-  "google-drive|https://drivemcp.googleapis.com/mcp/v1"
-  "google-calendar|https://calendarmcp.googleapis.com/mcp/v1"
-  "slack|https://mcp.slack.com/mcp"
-  "vercel|https://mcp.vercel.com"
-  "excalidraw|https://mcp.excalidraw.com/mcp"
-)
+# entries <type>  -> "name|value" lines of selected categories
+entries() {
+  echo "$CATALOGUE" | awk -F'|' -v t="$1" -v sel="$SELECTED" \
+    'BEGIN{n=split(sel,s," "); for(i=1;i<=n;i++) ok[s[i]]=1} NF && $2==t && ok[$1] {print $3 "|" $4}'
+}
+
+install_agents_md() {
+  local dst="$HOME/.codex/AGENTS.md"
+  [ "$DRY" = 1 ] && { echo "+ copy shared/AGENTS.md -> $dst"; return; }
+  mkdir -p "$HOME/.codex"
+  [ -f "$dst" ] && ! cmp -s "$dst" "$ROOT/shared/AGENTS.md" && cp "$dst" "$dst.bak"
+  cp "$ROOT/shared/AGENTS.md" "$dst" && echo "wrote $dst"
+}
+
+install_claude_md() {
+  local f="$HOME/.claude/CLAUDE.md" line="@~/.codex/AGENTS.md"
+  install_agents_md
+  if [ -f "$f" ] && grep -qF "$line" "$f"; then echo "CLAUDE.md already imports AGENTS.md"
+  elif [ "$DRY" = 1 ]; then echo "+ append '$line' to $f"
+  else mkdir -p "$HOME/.claude"; printf '\n# Shared instructions (managed by AI_dev_setup)\n%s\n' "$line" >> "$f"; echo "updated $f"; fi
+}
 
 # ======================= Claude Code =======================
 claude_setup() {
-  say "Claude Code"
-  have claude || { echo "claude CLI not found. Install: https://docs.claude.com/en/docs/claude-code" >&2; FAILED+=("claude CLI missing"); return; }
+  say "Claude Code  [categories: $SELECTED]"
+  have claude || { echo "claude CLI not found: https://docs.claude.com/en/docs/claude-code" >&2; FAILED+=("claude CLI missing"); return; }
 
   if [ "$DO_PLUGINS" = 1 ]; then
-    local markets; markets="$(claude plugin marketplace list 2>/dev/null || true)"
-    add_market() { # name repo
-      if grep -q "❯ $1\b" <<<"$markets"; then echo "marketplace $1 already added"; else run claude plugin marketplace add "$2"; fi
-    }
-    add_market ponytail DietrichGebert/ponytail
-    add_market claude-plugins-official anthropics/claude-plugins-official
-    add_market anthropic-agent-skills anthropics/skills
-    add_market openai-codex openai/codex-plugin-cc
-    [ "$WITH_ECC" = 1 ] && add_market ecc affaan-m/ECC
-
-    local plugins; plugins="$(claude plugin list 2>/dev/null || true)"
-    add_plugin() { # name@market
-      if grep -q "❯ $1" <<<"$plugins"; then echo "plugin $1 already installed"; else run claude plugin install "$1" --scope user; fi
-    }
-    add_plugin ponytail@ponytail
-    add_plugin code-review@claude-plugins-official
-    add_plugin codex@openai-codex
-    [ "$WITH_ECC" = 1 ] && add_plugin ecc@ecc
+    local markets plugins name value
+    markets="$(claude plugin marketplace list 2>/dev/null || true)"
+    plugins="$(claude plugin list 2>/dev/null || true)"
+    while IFS='|' read -r name value; do
+      [ -z "$name" ] && continue
+      if grep -qE "❯ ${name}\$" <<<"$markets"; then echo "marketplace $name already added"; else run claude plugin marketplace add "$value"; fi
+    done < <(entries market)
+    if [ "$WITH_ECC" = 1 ]; then
+      grep -qE "❯ ecc\$" <<<"$markets" || run claude plugin marketplace add "$ECC_MARKET"
+    fi
+    while IFS='|' read -r name value; do
+      [ -z "$name" ] && continue
+      if grep -qE "❯ ${name}\$" <<<"$plugins"; then echo "plugin $name already installed"; else run claude plugin install "$name" --scope user; fi
+    done < <(entries plugin)
+    if [ "$WITH_ECC" = 1 ]; then
+      grep -q "❯ ecc@ecc" <<<"$plugins" || run claude plugin install ecc@ecc --scope user
+    fi
   fi
 
   if [ "$DO_MCP" = 1 ]; then
     local existing; existing="$(claude mcp list 2>/dev/null || true)"
-    for entry in "${MCP_SERVERS[@]}"; do
-      local name="${entry%%::*}" cmd="${entry#*::}"
+    while IFS='|' read -r name value; do
+      [ -z "$name" ] && continue
       if grep -q "^$name:" <<<"$existing"; then echo "mcp $name already configured"; else
         # shellcheck disable=SC2086
-        run claude mcp add --scope user "$name" -- $cmd
+        run claude mcp add --scope user "$name" -- $value
       fi
-    done
-    if [ -n "${GITHUB_PERSONAL_ACCESS_TOKEN:-}" ]; then
-      grep -q "^github:" <<<"$existing" || \
-        run claude mcp add --scope user github -e GITHUB_PERSONAL_ACCESS_TOKEN="$GITHUB_PERSONAL_ACCESS_TOKEN" -- npx -y @modelcontextprotocol/server-github
-    else
-      echo "skip github MCP: export GITHUB_PERSONAL_ACCESS_TOKEN=... and re-run to enable"
-    fi
+    done < <(entries mcp)
+    case " $SELECTED " in *" dev "*)
+      if [ -n "${GITHUB_PERSONAL_ACCESS_TOKEN:-}" ]; then
+        grep -q "^github:" <<<"$existing" || \
+          run claude mcp add --scope user github -e GITHUB_PERSONAL_ACCESS_TOKEN="$GITHUB_PERSONAL_ACCESS_TOKEN" -- npx -y @modelcontextprotocol/server-github
+      else echo "skip github MCP: export GITHUB_PERSONAL_ACCESS_TOKEN and re-run"; fi ;;
+    esac
   fi
 
   if [ "$DO_CONFIG" = 1 ]; then
@@ -128,64 +188,49 @@ claude_setup() {
   fi
 }
 
-install_claude_md() {
-  local f="$HOME/.claude/CLAUDE.md" line="@~/.codex/AGENTS.md"
-  run mkdir -p "$HOME/.claude" "$HOME/.codex"
-  # Claude imports the shared file; make sure the file it points at exists even for --claude only.
-  install_agents_md
-  if [ -f "$f" ] && grep -qF "$line" "$f"; then echo "CLAUDE.md already imports AGENTS.md"
-  elif [ "$DRY" = 1 ]; then echo "+ append '$line' to $f"
-  else printf '\n# Shared instructions (managed by ai-dev-setup)\n%s\n' "$line" >> "$f"; echo "updated $f"; fi
-}
-
 # ======================= Codex =======================
-install_agents_md() {
-  local dst="$HOME/.codex/AGENTS.md"
-  [ "$DRY" = 1 ] && { echo "+ copy shared/AGENTS.md -> $dst"; return; }
-  mkdir -p "$HOME/.codex"
-  [ -f "$dst" ] && ! cmp -s "$dst" "$ROOT/shared/AGENTS.md" && cp "$dst" "$dst.bak"
-  cp "$ROOT/shared/AGENTS.md" "$dst" && echo "wrote $dst"
-}
-
 codex_setup() {
-  say "Codex"
-  have codex || { echo "codex CLI not found. Install: npm install -g @openai/codex   (the app bundles its own; the CLI is needed for this script)" >&2; FAILED+=("codex CLI missing"); return; }
+  say "Codex  [categories: $SELECTED]"
+  have codex || { echo "codex CLI not found: npm install -g @openai/codex" >&2; FAILED+=("codex CLI missing"); return; }
 
   if [ "$DO_PLUGINS" = 1 ]; then
     run codex plugin marketplace add DietrichGebert/ponytail
     run codex plugin add ponytail@ponytail
     if [ "$WITH_ECC" = 1 ]; then
-      run codex plugin marketplace add affaan-m/ECC
+      run codex plugin marketplace add "$ECC_MARKET"
       run codex plugin add ecc@ecc
     fi
-    echo "NOTE: open /hooks in Codex and trust the plugin hooks, then start a new thread."
+    echo "NOTE: open /hooks in Codex, trust the plugin hooks, start a new thread."
   fi
 
   if [ "$DO_MCP" = 1 ]; then
-    local existing; existing="$(codex mcp list 2>/dev/null || true)"
-    for entry in "${MCP_SERVERS[@]}"; do
-      local name="${entry%%::*}" cmd="${entry#*::}"
+    local existing name value; existing="$(codex mcp list 2>/dev/null || true)"
+    while IFS='|' read -r name value; do
+      [ -z "$name" ] && continue
       if grep -qE "^$name( |\$)" <<<"$existing"; then echo "mcp $name already configured"; else
         # shellcheck disable=SC2086
-        run codex mcp add "$name" -- $cmd
+        run codex mcp add "$name" -- $value
       fi
-    done
-    if [ -n "${GITHUB_PERSONAL_ACCESS_TOKEN:-}" ]; then
-      grep -qE "^github( |\$)" <<<"$existing" || \
-        run codex mcp add github --env GITHUB_PERSONAL_ACCESS_TOKEN="$GITHUB_PERSONAL_ACCESS_TOKEN" -- npx -y @modelcontextprotocol/server-github
-    fi
+    done < <(entries mcp)
+    case " $SELECTED " in *" dev "*)
+      if [ -n "${GITHUB_PERSONAL_ACCESS_TOKEN:-}" ]; then
+        grep -qE "^github( |\$)" <<<"$existing" || \
+          run codex mcp add github --env GITHUB_PERSONAL_ACCESS_TOKEN="$GITHUB_PERSONAL_ACCESS_TOKEN" -- npx -y @modelcontextprotocol/server-github
+      fi ;;
+    esac
     if [ "$WITH_CONNECTORS" = 1 ]; then
-      for entry in "${CONNECTORS[@]}"; do
-        local name="${entry%%|*}" url="${entry#*|}"
+      while IFS='|' read -r name value; do
+        [ -z "$name" ] && continue
         if grep -qE "^$name( |\$)" <<<"$existing"; then echo "mcp $name already configured"; else
-          run codex mcp add "$name" --url "$url"
+          run codex mcp add "$name" --url "$value"
           echo "  -> authorize with: codex mcp login $name"
         fi
-      done
+      done < <(entries remote)
     fi
   fi
 
   [ "$DO_CONFIG" = 1 ] && install_agents_md
+  return 0
 }
 
 [ "$DO_CLAUDE" = 1 ] && claude_setup
@@ -193,8 +238,8 @@ codex_setup() {
 
 say "Done"
 if [ "${#FAILED[@]}" -gt 0 ]; then
-  echo "These steps failed (re-run after fixing, the script is idempotent):"
+  echo "Failed steps (fix and re-run; the script is idempotent):"
   printf '  - %s\n' "${FAILED[@]}"
   exit 1
 fi
-echo "All steps completed. Restart Claude Code / Codex so new plugins and MCP servers load."
+echo "Completed. Restart Claude Code / Codex to load new plugins and MCP servers."

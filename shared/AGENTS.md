@@ -20,8 +20,13 @@ Edit it here, then re-run `./install.sh --config-only`.
 - Work on a feature branch. Never push directly to `main`/`master`.
 - Small, focused commits with a clear message. Only commit or push when asked.
 
-## Tools available (see the repo README for what each does)
-- MCP: context7 (up-to-date library docs), sequential-thinking, memory, playwright (browser),
-  magic (UI components), github, pdf.
-- Plugins: ponytail (minimal-code discipline), code-review, ECC (optional), codex <-> claude bridge.
-- Use context7 for library/API docs instead of relying on memory.
+## Tools available (categories; see the repo README for details)
+- core: context7 (current library docs, use instead of memory), sequential-thinking, memory;
+  plugins ponytail (minimal-code discipline), code-review, codex bridge (Claude Code only).
+- dev: playwright (real Chrome), github, vercel.
+- design: magic (UI components), excalidraw (diagrams), design plugin skills.
+- video / audio: ffmpeg-llm, watch-video, transcribe-so, ElevenLabs.
+- docs: pdf, Claude Docs, Google Drive, docx/pdf/pptx/xlsx skills.
+- productivity, jobs, learning, finance: Gmail, Calendar, Slack, AgentMail; Indeed, Dice, ZipRecruiter,
+  JobDataLake; Coursera; finance and investment-banking skills.
+- Only use a tool that is actually connected in the current session; do not assume the full list is present.
