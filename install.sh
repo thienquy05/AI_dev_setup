@@ -15,6 +15,7 @@ ALL_CATEGORIES="dev design video audio docs productivity jobs learning finance a
 #   cmarket : Codex plugin marketplace                 value = GitHub owner/repo
 #   cplugin : plugin installed from a Codex marketplace name = plugin@marketplace
 #   cmcp    : MCP server for Codex only (Claude gets it from a plugin)  value = command line
+#   cskill  : skill installed for Codex into ~/.agents/skills/<name>   value = install command
 #   remote  : remote OAuth MCP server (Codex only,     value = URL
 #             --connectors; Claude gets these from your claude.ai account)
 # Items with no installer (account-synced plugins/connectors) are documented in README.md.
@@ -38,10 +39,12 @@ core|mcp|sequential-thinking|npx -y @modelcontextprotocol/server-sequential-thin
 core|mcp|memory|npx -y @modelcontextprotocol/server-memory
 dev|mcp|playwright|npx -y @playwright/mcp --browser chrome
 dev|mcp|token-optimizer|npx -y token-optimizer-mcp
+dev|cmcp|chrome-devtools|npx -y chrome-devtools-mcp@1.10.1
 dev|remote|vercel|https://mcp.vercel.com
 design|mcp|magic|npx -y @magicuidesign/mcp@latest
 design|market|ui-ux-pro-max-skill|nextlevelbuilder/ui-ux-pro-max-skill
 design|plugin|ui-ux-pro-max@ui-ux-pro-max-skill|
+design|cskill|ui-ux-pro-max|npx -y ui-ux-pro-max-cli init --ai universal --global
 design|remote|excalidraw|https://mcp.excalidraw.com/mcp
 audio|remote|elevenlabs|https://api.elevenlabs.io/v1/mcp
 docs|mcp|pdf|npx -y @modelcontextprotocol/server-pdf --stdio
@@ -248,6 +251,17 @@ codex_setup() {
         fi
       done < <(entries remote)
     fi
+  fi
+
+  if [ "$DO_PLUGINS" = 1 ]; then
+    local sname scmd
+    while IFS='|' read -r sname scmd; do
+      [ -z "$sname" ] && continue
+      if [ -d "$HOME/.agents/skills/$sname" ]; then echo "skill $sname already in ~/.agents/skills"; else
+        # shellcheck disable=SC2086
+        run $scmd
+      fi
+    done < <(entries cskill)
   fi
 
   [ "$DO_CONFIG" = 1 ] && install_agents_md

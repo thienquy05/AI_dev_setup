@@ -15,13 +15,14 @@ export GITHUB_PERSONAL_ACCESS_TOKEN=ghp_xxx   # optional, enables the github MCP
 2. [Installer usage](#2-installer-usage)
 3. [How it works](#3-how-it-works)
 4. [Categories](#4-categories)
-5. [Manual commands](#5-manual-commands)
-6. [Configuration files](#6-configuration-files)
-7. [Shared AGENTS.md](#7-shared-agentsmd)
-8. [Account-synced items](#8-account-synced-items)
-9. [Excluded items](#9-excluded-items)
-10. [Troubleshooting](#10-troubleshooting)
-11. [Maintenance](#11-maintenance)
+5. [Codex coverage](#5-codex-coverage)
+6. [Manual commands](#6-manual-commands)
+7. [Configuration files](#7-configuration-files)
+8. [Shared AGENTS.md](#8-shared-agentsmd)
+9. [Account-synced items](#9-account-synced-items)
+10. [Excluded items](#10-excluded-items)
+11. [Troubleshooting](#11-troubleshooting)
+12. [Maintenance](#12-maintenance)
 
 ## 1. Requirements
 
@@ -70,7 +71,7 @@ After installing:
 
 ## 4. Categories
 
-Installer column: **script** = installed by `install.sh`; **account** = synced from the claude.ai account (see [section 8](#8-account-synced-items)).
+Installer column: **script** = installed by `install.sh`; **account** = synced from the claude.ai account (see [section 9](#9-account-synced-items)).
 
 ### core (always installed)
 
@@ -92,6 +93,7 @@ Installer column: **script** = installed by `install.sh`; **account** = synced f
 |---|---|---|---|
 | playwright | MCP, `@playwright/mcp --browser chrome` | script | Controls a real Chrome browser: navigate, click, screenshot, test UIs. |
 | token-optimizer | MCP, `token-optimizer-mcp` | script | Context-window optimization: stores large content externally with caching and compression so it does not occupy the context. |
+| chrome-devtools | MCP, `chrome-devtools-mcp@1.10.1` | Claude Code: bundled with ECC; Codex: script | Chrome DevTools debugging and performance traces. |
 | github | MCP, `@modelcontextprotocol/server-github` | script, needs `GITHUB_PERSONAL_ACCESS_TOKEN` | Repositories, issues, pull requests, code search. The npm package is no longer actively developed; maintained alternative: https://github.com/github/github-mcp-server. |
 | vercel | remote MCP, `https://mcp.vercel.com` | account (Claude Code), script `--with-connectors` (Codex) | Deployments, logs, projects, domains, environment variables. |
 | engineering | plugin | account | Skills: architecture, code-review, debug, deploy-checklist, documentation, incident-response, standup, system-design, tech-debt, testing-strategy. Bundles connectors for Slack, Linear, Atlassian, Notion, Datadog, PagerDuty, GitHub (each needs authorization). |
@@ -101,7 +103,7 @@ Installer column: **script** = installed by `install.sh`; **account** = synced f
 | Tool | Type | Installer | Purpose |
 |---|---|---|---|
 | magic | MCP, `@magicuidesign/mcp` | script | Magic UI component library: look up and generate animated React/Tailwind components. |
-| ui-ux-pro-max | plugin, [nextlevelbuilder/ui-ux-pro-max-skill](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) | script (Claude Code) | UI/UX design intelligence skill: searchable databases of 79 styles, 192 palettes, 74 font pairings, 25 chart types and 22 stack guidelines (React, Next.js, Vue, Svelte, SwiftUI, Flutter, Tailwind, shadcn/ui and others). Requires Python 3. Codex: `npm install -g ui-ux-pro-max-cli`, then `uipro init --ai codex` inside a project (section 5). |
+| ui-ux-pro-max | plugin, [nextlevelbuilder/ui-ux-pro-max-skill](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) | script (Claude Code) | UI/UX design intelligence skill: searchable databases of 79 styles, 192 palettes, 74 font pairings, 25 chart types and 22 stack guidelines (React, Next.js, Vue, Svelte, SwiftUI, Flutter, Tailwind, shadcn/ui and others). Requires Python 3. Codex: installed by the script as a skill in `~/.agents/skills/` (`npx -y ui-ux-pro-max-cli init --ai universal --global`). |
 | excalidraw | remote MCP, `https://mcp.excalidraw.com/mcp` | account (Claude Code), script `--with-connectors` (Codex) | Create diagrams and whiteboard drawings. |
 | design | plugin | account | Skills: accessibility-review (WCAG 2.1 AA), design-critique, design-handoff, design-system, research-synthesis, user-research, ux-copy. Bundles connectors for Figma, Asana, Intercom, Linear, Notion, Slack, Atlassian (each needs authorization). |
 
@@ -182,7 +184,26 @@ No script installer exists for this category.
 |---|---|---|---|
 | rea | MCP, `rea-agents@6.5.0 mcp` ([morluto/rea](https://github.com/morluto/rea)) | script | Reverse-engineering toolkit for native binaries, JavaScript/Electron apps, .NET assemblies and websites, using local Hopper, Ghidra or IDA when available. Use only on software you are authorized to analyze. `npx rea-agents setup` additionally registers workflow instructions with each agent. Version pinned to match the original setup (latest published: 6.7.0). |
 
-## 5. Manual commands
+## 5. Codex coverage
+
+Codex-only install: `./install.sh --codex` (add `--with-connectors` for remote servers, then `codex mcp login <name>`). Codex loads skills from `~/.agents/skills` (user) and `<repo>/.agents/skills` (project), MCP servers from `~/.codex/config.toml`, and instructions from `~/.codex/AGENTS.md`.
+
+| Category | Installed for Codex | Not available for Codex |
+|---|---|---|
+| core | ponytail, ECC, context7, sequential-thinking, memory, shared `AGENTS.md` | `code-review` (Codex has built-in `/review`), `codex` bridge plugin (Claude Code only), account-synced plugins |
+| dev | playwright, chrome-devtools, token-optimizer, github (with token); vercel via `--with-connectors` | `engineering` plugin |
+| design | magic, ui-ux-pro-max skill; excalidraw via `--with-connectors` | `design` plugin |
+| video | none | `ffmpeg-llm`, `watch-video`, `video-to-code-skill` (claude.ai account only) |
+| audio | elevenlabs via `--with-connectors` | `transcribe-so` plugin |
+| docs | pdf; claude-docs, google-drive, goodnotes via `--with-connectors` | `pdf-viewer`, Anthropic built-in skills |
+| productivity, jobs, learning | all remote servers via `--with-connectors` | none |
+| finance | none | `finance`, `investment-banking` plugins |
+| agents | ruflo MCP | `ruflo-core`, `ruflo-console`, `ruflo-mods` (Claude Code mods) |
+| security | rea | none |
+
+Remote servers use OAuth. Some were issued for claude.ai and may refuse authorization from Codex; failures are reported at the end of the run.
+
+## 6. Manual commands
 
 ### Claude Code
 
@@ -242,14 +263,14 @@ codex mcp add memory -- npx -y @modelcontextprotocol/server-memory
 codex plugin marketplace add affaan-m/ECC && codex plugin add ecc@ecc
 
 # dev
+codex mcp add chrome-devtools -- npx -y chrome-devtools-mcp@1.10.1
 codex mcp add token-optimizer -- npx -y token-optimizer-mcp
 codex mcp add playwright -- npx -y @playwright/mcp --browser chrome
 codex mcp add github --env GITHUB_PERSONAL_ACCESS_TOKEN=ghp_xxx -- npx -y @modelcontextprotocol/server-github
 
 # design
 codex mcp add magic -- npx -y @magicuidesign/mcp@latest
-npm install -g ui-ux-pro-max-cli
-uipro init --ai codex            # run inside each project; add --global where supported
+npx -y ui-ux-pro-max-cli init --ai universal --global   # installs the skill into ~/.agents/skills/ (read by Codex)
 
 # agents
 codex mcp add ruflo -- npx -y ruflo@latest mcp start
@@ -268,7 +289,7 @@ codex mcp login vercel
 
 Verify: `codex mcp list`, `codex plugin list --json`. TOML alternative: [`codex/config.snippet.toml`](codex/config.snippet.toml).
 
-## 6. Configuration files
+## 7. Configuration files
 
 Items that only work once present in a config file. `install.sh` writes them; manual equivalents below.
 
@@ -283,11 +304,11 @@ Items that only work once present in a config file. `install.sh` writes them; ma
 
 **`~/.codex/config.toml`**: `[mcp_servers.<name>]` blocks, created by `codex mcp add`.
 
-**`~/.codex/AGENTS.md`** and **`~/.claude/CLAUDE.md`**: see section 7.
+**`~/.codex/AGENTS.md`** and **`~/.claude/CLAUDE.md`**: see section 8.
 
 Not copied: `permissions.allow` (project-specific paths) and `statusLine` (hard-coded versioned plugin path).
 
-## 7. Shared AGENTS.md
+## 8. Shared AGENTS.md
 
 [`shared/AGENTS.md`](shared/AGENTS.md) is the single source of truth for agent instructions: ask instead of guessing, match local style, minimal diffs, verify before reporting done, no direct pushes to `main`, no secrets in git, and the category tool list.
 
@@ -296,7 +317,7 @@ Not copied: `permissions.allow` (project-specific paths) and `statusLine` (hard-
 - Edit `shared/AGENTS.md`, then run `./install.sh --config-only` to redeploy.
 - Per-project override: add `AGENTS.md` to the repository (Codex) and a `CLAUDE.md` containing `@AGENTS.md` (Claude Code).
 
-## 8. Account-synced items
+## 9. Account-synced items
 
 Plugins and connectors marked **account** sync when Claude Code is signed in to the same claude.ai account. They cannot be installed from a repository.
 
@@ -305,7 +326,7 @@ Plugins and connectors marked **account** sync when Claude Code is signed in to 
 - Plugin-bundled MCP entries (`plugin:engineering:*`, `plugin:design:*`, `plugin:finance:*`) show "Needs authentication" until authorized in Claude Code. Asana reports "does not support dynamic client registration"; this is a server limitation.
 - Remote connector URLs were taken from Claude Code. Authorization from Codex is not guaranteed for every server (some are issued for claude.ai only); a failure is reported at the end of the run and does not stop other steps.
 
-## 9. Excluded items
+## 10. Excluded items
 
 | Item | Reason |
 |---|---|
@@ -313,7 +334,7 @@ Plugins and connectors marked **account** sync when Claude Code is signed in to 
 | harness-os | Docker MCP bound to local `~/Project/harness_os` and a local Postgres (`DATABASE_URL` in its command). |
 | `permissions.allow`, per-project paths | Project-specific. |
 
-## 10. Troubleshooting
+## 11. Troubleshooting
 
 | Symptom | Action |
 |---|---|
@@ -326,7 +347,7 @@ Plugins and connectors marked **account** sync when Claude Code is signed in to 
 | ECC duplicated skills or hooks | Follow "Reset / Uninstall ECC" in the ECC README; do not mix plugin and manual installs. |
 | Restore previous config | `~/.claude/settings.json.bak`, `~/.codex/AGENTS.md.bak`. |
 
-## 11. Maintenance
+## 12. Maintenance
 
 1. Capture the current state: `claude plugin marketplace list`, `claude plugin list`, `claude mcp list`, `codex mcp list`, `cat ~/.codex/config.toml`.
 2. Add new items as a row in the `CATALOGUE` block of `install.sh` (`category|type|name|value`).
