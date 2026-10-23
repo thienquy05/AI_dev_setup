@@ -21,9 +21,8 @@ export GITHUB_PERSONAL_ACCESS_TOKEN=ghp_xxx   # optional, enables the github MCP
 8. [Shared AGENTS.md](#8-shared-agentsmd)
 9. [Optional apps](#9-optional-apps)
 10. [Account-synced items](#10-account-synced-items)
-11. [Excluded items](#11-excluded-items)
-12. [Troubleshooting](#12-troubleshooting)
-13. [Maintenance](#13-maintenance)
+11. [Troubleshooting](#11-troubleshooting)
+12. [Maintenance](#12-maintenance)
 
 ## 1. Requirements
 
@@ -317,15 +316,7 @@ Plugins and connectors marked **account** sync when Claude Code is signed in to 
 - Plugin-bundled MCP entries (`plugin:engineering:*`, `plugin:design:*`) show "Needs authentication" until authorized in Claude Code. Asana reports "does not support dynamic client registration"; this is a server limitation.
 - Remote connector URLs were taken from Claude Code. Authorization from Codex is not guaranteed for every server (some are issued for claude.ai only); a failure is reported at the end of the run and does not stop other steps.
 
-## 11. Excluded items
-
-| Item | Reason |
-|---|---|
-| productivity, jobs, learning, finance categories | Removed: not needed for development (Gmail, Calendar, Slack, AgentMail; Indeed, Dice, ZipRecruiter, JobDataLake, Jobs and Careers; Coursera; `finance`, `investment-banking`; Robinhood, Intuit TurboTax). Connectors and synced plugins that are enabled on the claude.ai account still load in Claude Code; disable them in claude.ai → Settings → Connectors and Plugins to remove them. |
-| harness-os | Docker MCP bound to local `~/Project/harness_os` and a local Postgres (`DATABASE_URL` in its command). |
-| `permissions.allow`, per-project paths | Project-specific. |
-
-## 12. Troubleshooting
+## 11. Troubleshooting
 
 | Symptom | Action |
 |---|---|
@@ -338,7 +329,7 @@ Plugins and connectors marked **account** sync when Claude Code is signed in to 
 | ECC duplicated skills or hooks | Follow "Reset / Uninstall ECC" in the ECC README; do not mix plugin and manual installs. |
 | Restore previous config | `~/.claude/settings.json.bak`, `~/.codex/AGENTS.md.bak`. |
 
-## 13. Maintenance
+## 12. Maintenance
 
 1. Capture the current state: `claude plugin marketplace list`, `claude plugin list`, `claude mcp list`, `codex mcp list`, `cat ~/.codex/config.toml`.
 2. Add new items as a row in the `CATALOGUE` block of `install.sh` (`category|type|name|value`).
