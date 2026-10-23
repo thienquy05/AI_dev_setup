@@ -22,9 +22,10 @@ Edit it here, then re-run `./install.sh --config-only`.
 
 ## Tools available (categories; see the repo README for details)
 - core: context7 (current library docs, use instead of memory), sequential-thinking, memory;
-  plugins ponytail (minimal-code discipline), code-review, codex bridge (Claude Code only).
-- dev: playwright (real Chrome), github, vercel.
-- design: magic (UI components), excalidraw (diagrams), design plugin skills.
+  plugins ponytail (minimal-code discipline), code-review, codex bridge (Claude Code only), ECC.
+- dev: playwright (real Chrome), chrome-devtools (via ECC), token-optimizer, github, vercel.
+- design: magic (UI components), ui-ux-pro-max (UI/UX rules), excalidraw (diagrams), design plugin skills.
+- agents: ruflo (swarms, orchestration). security: rea (reverse engineering; authorized targets only).
 - video / audio: ffmpeg-llm, watch-video, transcribe-so, ElevenLabs.
 - docs: pdf, Claude Docs, Google Drive, docx/pdf/pptx/xlsx skills.
 - productivity, jobs, learning, finance: Gmail, Calendar, Slack, AgentMail; Indeed, Dice, ZipRecruiter,

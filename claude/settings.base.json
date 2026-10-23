@@ -4,13 +4,50 @@
   "enabledPlugins": {
     "ponytail@ponytail": true,
     "code-review@claude-plugins-official": true,
-    "codex@openai-codex": true
+    "codex@openai-codex": true,
+    "ecc@ecc": true
   },
   "extraKnownMarketplaces": {
-    "ponytail": { "source": { "source": "github", "repo": "DietrichGebert/ponytail" } },
-    "anthropic-agent-skills": { "source": { "source": "github", "repo": "anthropics/skills" } },
-    "ecc": { "source": { "source": "github", "repo": "affaan-m/ECC" } },
-    "openai-codex": { "source": { "source": "github", "repo": "openai/codex-plugin-cc" } }
+    "ponytail": {
+      "source": {
+        "source": "github",
+        "repo": "DietrichGebert/ponytail"
+      }
+    },
+    "anthropic-agent-skills": {
+      "source": {
+        "source": "github",
+        "repo": "anthropics/skills"
+      }
+    },
+    "ecc": {
+      "source": {
+        "source": "github",
+        "repo": "affaan-m/ECC"
+      }
+    },
+    "openai-codex": {
+      "source": {
+        "source": "github",
+        "repo": "openai/codex-plugin-cc"
+      }
+    },
+    "ruflo": {
+      "source": {
+        "source": "github",
+        "repo": "ruvnet/ruflo"
+      }
+    },
+    "ui-ux-pro-max-skill": {
+      "source": {
+        "source": "github",
+        "repo": "nextlevelbuilder/ui-ux-pro-max-skill"
+      }
+    }
   },
-  "sandbox": { "excludedCommands": ["codex"] }
+  "sandbox": {
+    "excludedCommands": [
+      "codex"
+    ]
+  }
 }

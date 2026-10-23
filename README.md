@@ -32,6 +32,8 @@ export GITHUB_PERSONAL_ACCESS_TOKEN=ghp_xxx   # optional, enables the github MCP
 | Codex CLI | `codex plugin`, `codex mcp` (the Codex app and IDE extension read the same `~/.codex/config.toml`) | `npm install -g @openai/codex`, then `codex login` |
 | Google Chrome | `playwright` MCP (`--browser chrome`) | `brew install --cask google-chrome` |
 | GitHub token (optional) | `github` MCP | https://github.com/settings/tokens |
+| Claude Code 2.1.287+ | `agents` category (ruflo mods) | `claude update` |
+| Python 3 | `ui-ux-pro-max` search scripts | `brew install python` |
 | ffmpeg, yt-dlp (video category) | `ffmpeg-llm`, `watch-video` | `brew install ffmpeg yt-dlp` |
 
 ## 2. Installer usage
@@ -44,12 +46,12 @@ export GITHUB_PERSONAL_ACCESS_TOKEN=ghp_xxx   # optional, enables the github MCP
 | `./install.sh --design --video` | core + design + video |
 | `./install.sh --claude` / `--codex` | one tool only |
 | `./install.sh --plugins-only` / `--mcp-only` / `--config-only` | one part only |
-| `./install.sh --with-ecc` | also install Everything Claude Code (`ecc@ecc`) |
+| `./install.sh --no-ecc` | skip Everything Claude Code (installed by default as part of core) |
 | `./install.sh --with-connectors` | also add the selected categories' remote OAuth connectors to Codex |
 | `./install.sh --list` | print the catalogue per category |
 | `./install.sh --dry-run` | print commands, change nothing |
 
-Category flags: `--dev --design --video --audio --docs --productivity --jobs --learning --finance`.
+Category flags: `--dev --design --video --audio --docs --productivity --jobs --learning --finance --agents --security`.
 
 After installing:
 - Restart Claude Code / Codex.
@@ -82,13 +84,14 @@ Installer column: **script** = installed by `install.sh`; **account** = synced f
 | memory | MCP, `@modelcontextprotocol/server-memory` | script | Knowledge-graph memory persisted across sessions. |
 | anthropic-agent-skills | marketplace, [anthropics/skills](https://github.com/anthropics/skills) | script (registered only) | Optional skill packs: `/plugin install document-skills@anthropic-agent-skills`, `/plugin install example-skills@anthropic-agent-skills`. |
 | cowork-plugin-management | plugin | account | Create and customize plugins. |
-| ECC (opt-in) | plugin `ecc@ecc`, [affaan-m/ECC](https://github.com/affaan-m/ECC) | script, `--with-ecc` (Claude Code + Codex) | Agents, skills, command shims, hooks, rules, memory and AgentShield scanning. Do not combine with a manual ECC install. |
+| ECC | plugin `ecc@ecc`, [affaan-m/ECC](https://github.com/affaan-m/ECC) | script (Claude Code + Codex); skip with `--no-ecc` | Everything Claude Code: agents, skills, command shims, hooks, rules, memory/continuous learning and AgentShield scanning of prompts, hooks and MCP config. Also provides the `chrome-devtools` MCP (`npx -y chrome-devtools-mcp`, Chrome DevTools debugging and performance traces) as `plugin:ecc:chrome-devtools`. Do not combine with a manual ECC install; the install may print a note that `package.json` overrides were not applied, which does not affect the plugin. |
 
 ### dev (`--dev`)
 
 | Tool | Type | Installer | Purpose |
 |---|---|---|---|
 | playwright | MCP, `@playwright/mcp --browser chrome` | script | Controls a real Chrome browser: navigate, click, screenshot, test UIs. |
+| token-optimizer | MCP, `token-optimizer-mcp` | script | Context-window optimization: stores large content externally with caching and compression so it does not occupy the context. |
 | github | MCP, `@modelcontextprotocol/server-github` | script, needs `GITHUB_PERSONAL_ACCESS_TOKEN` | Repositories, issues, pull requests, code search. The npm package is no longer actively developed; maintained alternative: https://github.com/github/github-mcp-server. |
 | vercel | remote MCP, `https://mcp.vercel.com` | account (Claude Code), script `--with-connectors` (Codex) | Deployments, logs, projects, domains, environment variables. |
 | engineering | plugin | account | Skills: architecture, code-review, debug, deploy-checklist, documentation, incident-response, standup, system-design, tech-debt, testing-strategy. Bundles connectors for Slack, Linear, Atlassian, Notion, Datadog, PagerDuty, GitHub (each needs authorization). |
@@ -98,6 +101,7 @@ Installer column: **script** = installed by `install.sh`; **account** = synced f
 | Tool | Type | Installer | Purpose |
 |---|---|---|---|
 | magic | MCP, `@magicuidesign/mcp` | script | Magic UI component library: look up and generate animated React/Tailwind components. |
+| ui-ux-pro-max | plugin, [nextlevelbuilder/ui-ux-pro-max-skill](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) | script (Claude Code) | UI/UX design intelligence skill: searchable databases of 79 styles, 192 palettes, 74 font pairings, 25 chart types and 22 stack guidelines (React, Next.js, Vue, Svelte, SwiftUI, Flutter, Tailwind, shadcn/ui and others). Requires Python 3. Codex: `npm install -g ui-ux-pro-max-cli`, then `uipro init --ai codex` inside a project (section 5). |
 | excalidraw | remote MCP, `https://mcp.excalidraw.com/mcp` | account (Claude Code), script `--with-connectors` (Codex) | Create diagrams and whiteboard drawings. |
 | design | plugin | account | Skills: accessibility-review (WCAG 2.1 AA), design-critique, design-handoff, design-system, research-synthesis, user-research, ux-copy. Bundles connectors for Figma, Asana, Intercom, Linear, Notion, Slack, Atlassian (each needs authorization). |
 
@@ -163,6 +167,21 @@ No script installer exists for this category. `./install.sh --video` installs co
 
 No script installer exists for this category.
 
+### agents (`--agents`)
+
+| Tool | Type | Installer | Purpose |
+|---|---|---|---|
+| ruflo-core | plugin, [ruvnet/ruflo](https://github.com/ruvnet/ruflo) | script (Claude Code) | Agent meta-harness core: registers the Ruflo MCP server, commands and orchestration patterns (swarms, agent teams, memory). Requires Claude Code 2.1.287+. |
+| ruflo-console | plugin | script (Claude Code) | Cockpit as a Claude Code mod: `/ruflo` opens overview, swarm topology, cost gauge, agent timeline, approvals and plugin catalog (early access). |
+| ruflo-mods | plugin | script (Claude Code) | Runtime mods: in-process prompt routing, edit-learning signals, tighten-only tool checks from ruflo policy, cost budget ladder (early access). Mods run with account permissions and are not sandboxed; review the code before installing. |
+| ruflo (MCP) | MCP, `npx -y ruflo@latest mcp start` | script (Codex) | Ruflo MCP server for Codex. Full project setup: `npx ruflo@latest init wizard` (run per project). |
+
+### security (`--security`)
+
+| Tool | Type | Installer | Purpose |
+|---|---|---|---|
+| rea | MCP, `rea-agents@6.5.0 mcp` ([morluto/rea](https://github.com/morluto/rea)) | script | Reverse-engineering toolkit for native binaries, JavaScript/Electron apps, .NET assemblies and websites, using local Hopper, Ghidra or IDA when available. Use only on software you are authorized to analyze. `npx rea-agents setup` additionally registers workflow instructions with each agent. Version pinned to match the original setup (latest published: 6.7.0). |
+
 ## 5. Manual commands
 
 ### Claude Code
@@ -181,17 +200,30 @@ claude mcp add --scope user sequential-thinking -- npx -y @modelcontextprotocol/
 claude mcp add --scope user memory -- npx -y @modelcontextprotocol/server-memory
 
 # dev
+claude mcp add --scope user token-optimizer -- npx -y token-optimizer-mcp
 claude mcp add --scope user playwright -- npx -y @playwright/mcp --browser chrome
 claude mcp add --scope user github -e GITHUB_PERSONAL_ACCESS_TOKEN=ghp_xxx -- npx -y @modelcontextprotocol/server-github
 
 # design
 claude mcp add --scope user magic -- npx -y @magicuidesign/mcp@latest
+claude plugin marketplace add nextlevelbuilder/ui-ux-pro-max-skill
+claude plugin install ui-ux-pro-max@ui-ux-pro-max-skill --scope user
 
 # docs
 claude mcp add --scope user pdf -- npx -y @modelcontextprotocol/server-pdf --stdio
 
-# optional
-claude plugin marketplace add affaan-m/ECC && claude plugin install ecc@ecc --scope user
+# agents
+claude plugin marketplace add ruvnet/ruflo
+claude plugin install ruflo-core@ruflo --scope user
+claude plugin install ruflo-console@ruflo --scope user
+claude plugin install ruflo-mods@ruflo --scope user
+
+# security
+claude mcp add --scope user rea -- npx -y rea-agents@6.5.0 mcp
+
+# core (ECC)
+claude plugin marketplace add affaan-m/ECC
+claude plugin install ecc@ecc --scope user
 ```
 
 Equivalent in-session commands: `/plugin marketplace add <owner/repo>`, `/plugin install <plugin>@<marketplace>`, `/reload-plugins`, `/codex:setup`.
@@ -207,13 +239,23 @@ codex plugin add ponytail@ponytail
 codex mcp add context7 -- npx -y @upstash/context7-mcp@latest
 codex mcp add sequential-thinking -- npx -y @modelcontextprotocol/server-sequential-thinking
 codex mcp add memory -- npx -y @modelcontextprotocol/server-memory
+codex plugin marketplace add affaan-m/ECC && codex plugin add ecc@ecc
 
 # dev
+codex mcp add token-optimizer -- npx -y token-optimizer-mcp
 codex mcp add playwright -- npx -y @playwright/mcp --browser chrome
 codex mcp add github --env GITHUB_PERSONAL_ACCESS_TOKEN=ghp_xxx -- npx -y @modelcontextprotocol/server-github
 
 # design
 codex mcp add magic -- npx -y @magicuidesign/mcp@latest
+npm install -g ui-ux-pro-max-cli
+uipro init --ai codex            # run inside each project; add --global where supported
+
+# agents
+codex mcp add ruflo -- npx -y ruflo@latest mcp start
+
+# security
+codex mcp add rea -- npx -y rea-agents@6.5.0 mcp
 
 # docs
 codex mcp add pdf -- npx -y @modelcontextprotocol/server-pdf --stdio
@@ -222,8 +264,6 @@ codex mcp add pdf -- npx -y @modelcontextprotocol/server-pdf --stdio
 codex mcp add vercel --url https://mcp.vercel.com
 codex mcp login vercel
 
-# optional
-codex plugin marketplace add affaan-m/ECC && codex plugin add ecc@ecc
 ```
 
 Verify: `codex mcp list`, `codex plugin list --json`. TOML alternative: [`codex/config.snippet.toml`](codex/config.snippet.toml).
@@ -236,8 +276,8 @@ Items that only work once present in a config file. `install.sh` writes them; ma
 
 | Key | Purpose |
 |---|---|
-| `enabledPlugins` | enables `ponytail@ponytail`, `code-review@claude-plugins-official`, `codex@openai-codex` |
-| `extraKnownMarketplaces` | declares marketplaces: ponytail, anthropic-agent-skills, ecc, openai-codex |
+| `enabledPlugins` | enables `ponytail@ponytail`, `code-review@claude-plugins-official`, `codex@openai-codex`, `ecc@ecc`; plugins from other categories are enabled by `claude plugin install` |
+| `extraKnownMarketplaces` | declares marketplaces: ponytail, anthropic-agent-skills, ecc, openai-codex, ruflo, ui-ux-pro-max-skill |
 | `sandbox.excludedCommands` | `["codex"]`, lets the Codex plugin run outside the sandbox |
 | `model`, `effortLevel` | defaults `opus` / `high`, applied only when unset |
 
@@ -270,8 +310,7 @@ Plugins and connectors marked **account** sync when Claude Code is signed in to 
 | Item | Reason |
 |---|---|
 | Robinhood, Intuit TurboTax connectors | Access financial accounts; not published in a public repository. Add manually. |
-| harness-os | Docker MCP bound to local `~/Project/harness_os` and a local Postgres. |
-| token-optimizer (`npx -y token-optimizer-mcp`) | Failed to connect (`CONNECTION_CLOSED`). |
+| harness-os | Docker MCP bound to local `~/Project/harness_os` and a local Postgres (`DATABASE_URL` in its command). |
 | `permissions.allow`, per-project paths | Project-specific. |
 
 ## 10. Troubleshooting
@@ -283,6 +322,7 @@ Plugins and connectors marked **account** sync when Claude Code is signed in to 
 | MCP "Failed to connect" | Run its command from section 4 in a terminal; usually Node is missing or outdated. |
 | Codex plugin inactive | Open `/hooks`, trust hooks, start a new thread. |
 | Remote connector not authorized in Codex | `codex mcp login <name>`; if refused, use the connector in Claude Code only. |
+| `ruflo-*` plugins not loading | Requires Claude Code 2.1.287+; run `claude update`, then `/reload-plugins`. |
 | ECC duplicated skills or hooks | Follow "Reset / Uninstall ECC" in the ECC README; do not mix plugin and manual installs. |
 | Restore previous config | `~/.claude/settings.json.bak`, `~/.codex/AGENTS.md.bak`. |
 
@@ -291,4 +331,5 @@ Plugins and connectors marked **account** sync when Claude Code is signed in to 
 1. Capture the current state: `claude plugin marketplace list`, `claude plugin list`, `claude mcp list`, `codex mcp list`, `cat ~/.codex/config.toml`.
 2. Add new items as a row in the `CATALOGUE` block of `install.sh` (`category|type|name|value`).
 3. Add the item to its category table in section 4 (and to `shared/AGENTS.md` if agents should know about it).
-4. Run `./install.sh --list` and `./install.sh --dry-run`, then commit.
+4. Merge tool lists from every machine in use (the catalogue is a union).
+5. Run `./install.sh --list` and `./install.sh --dry-run`, then commit.

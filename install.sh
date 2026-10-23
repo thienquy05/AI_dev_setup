@@ -5,13 +5,16 @@ set -uo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-ALL_CATEGORIES="dev design video audio docs productivity jobs learning finance"
+ALL_CATEGORIES="dev design video audio docs productivity jobs learning finance agents security"
 
 # ---------------------------------------------------------------------------
 # Catalogue. One entry per line:  category|type|name|value
 #   market  : Claude/Codex plugin marketplace          value = GitHub owner/repo
 #   plugin  : plugin installed from a marketplace      name  = plugin@marketplace
 #   mcp     : local stdio MCP server (Claude + Codex)  value = command line
+#   cmarket : Codex plugin marketplace                 value = GitHub owner/repo
+#   cplugin : plugin installed from a Codex marketplace name = plugin@marketplace
+#   cmcp    : MCP server for Codex only (Claude gets it from a plugin)  value = command line
 #   remote  : remote OAuth MCP server (Codex only,     value = URL
 #             --connectors; Claude gets these from your claude.ai account)
 # Items with no installer (account-synced plugins/connectors) are documented in README.md.
@@ -24,12 +27,21 @@ core|market|openai-codex|openai/codex-plugin-cc
 core|plugin|ponytail@ponytail|
 core|plugin|code-review@claude-plugins-official|
 core|plugin|codex@openai-codex|
+core|market|ecc|affaan-m/ECC
+core|plugin|ecc@ecc|
+core|cmarket|ponytail|DietrichGebert/ponytail
+core|cplugin|ponytail@ponytail|
+core|cmarket|ecc|affaan-m/ECC
+core|cplugin|ecc@ecc|
 core|mcp|context7|npx -y @upstash/context7-mcp@latest
 core|mcp|sequential-thinking|npx -y @modelcontextprotocol/server-sequential-thinking
 core|mcp|memory|npx -y @modelcontextprotocol/server-memory
 dev|mcp|playwright|npx -y @playwright/mcp --browser chrome
+dev|mcp|token-optimizer|npx -y token-optimizer-mcp
 dev|remote|vercel|https://mcp.vercel.com
 design|mcp|magic|npx -y @magicuidesign/mcp@latest
+design|market|ui-ux-pro-max-skill|nextlevelbuilder/ui-ux-pro-max-skill
+design|plugin|ui-ux-pro-max@ui-ux-pro-max-skill|
 design|remote|excalidraw|https://mcp.excalidraw.com/mcp
 audio|remote|elevenlabs|https://api.elevenlabs.io/v1/mcp
 docs|mcp|pdf|npx -y @modelcontextprotocol/server-pdf --stdio
@@ -46,13 +58,17 @@ jobs|remote|ziprecruiter|https://api.ziprecruiter.com/mcp
 jobs|remote|jobdatalake|https://mcp.jobdatalake.com
 jobs|remote|jobs-and-careers|https://jobs-and-careers-gpt-app.sonicapply.com/mcp
 learning|remote|coursera|https://api.coursera.com/mcp
+agents|market|ruflo|ruvnet/ruflo
+agents|plugin|ruflo-core@ruflo|
+agents|plugin|ruflo-console@ruflo|
+agents|plugin|ruflo-mods@ruflo|
+agents|cmcp|ruflo|npx -y ruflo@latest mcp start
+security|mcp|rea|npx -y rea-agents@6.5.0 mcp
 '
-# ECC (opt-in, --with-ecc)
-ECC_MARKET="affaan-m/ECC"
 
 DO_CLAUDE=1; DO_CODEX=1
 DO_PLUGINS=1; DO_MCP=1; DO_CONFIG=1
-WITH_ECC=0; WITH_CONNECTORS=0; DRY=0
+NO_ECC=0; WITH_CONNECTORS=0; DRY=0
 SELECTED=""   # empty = all categories
 
 usage() {
@@ -64,7 +80,7 @@ Targets (default: both)
   --codex               set up Codex only (app, CLI and IDE extension share ~/.codex/config.toml)
 
 Categories (default: core + every category). Passing any category flag installs core + only those.
-  --dev --design --video --audio --docs --productivity --jobs --learning --finance
+  --dev --design --video --audio --docs --productivity --jobs --learning --finance --agents --security
   --list                print the catalogue per category and exit
 
 Parts (default: all)
@@ -73,7 +89,7 @@ Parts (default: all)
   --config-only         settings.json merge + AGENTS.md only
 
 Extras
-  --with-ecc            install Everything Claude Code (ecc@ecc)
+  --no-ecc              skip Everything Claude Code (ecc@ecc is installed by default as part of core)
   --with-connectors     add remote OAuth connectors of the selected categories to Codex
   --dry-run             print commands, change nothing
   -h, --help
@@ -89,11 +105,11 @@ for a in "$@"; do
   case "$a" in
     --claude) DO_CODEX=0 ;;
     --codex) DO_CLAUDE=0 ;;
-    --dev|--design|--video|--audio|--docs|--productivity|--jobs|--learning|--finance) add_cat "${a#--}" ;;
+    --dev|--design|--video|--audio|--docs|--productivity|--jobs|--learning|--finance|--agents|--security) add_cat "${a#--}" ;;
     --plugins-only) DO_MCP=0; DO_CONFIG=0 ;;
     --mcp-only) DO_PLUGINS=0; DO_CONFIG=0 ;;
     --config-only) DO_PLUGINS=0; DO_MCP=0 ;;
-    --with-ecc) WITH_ECC=1 ;;
+    --no-ecc) NO_ECC=1 ;;
     --with-connectors) WITH_CONNECTORS=1 ;;
     --dry-run) DRY=1 ;;
     --list)
@@ -119,8 +135,9 @@ have() { command -v "$1" >/dev/null 2>&1; }
 
 # entries <type>  -> "name|value" lines of selected categories
 entries() {
-  echo "$CATALOGUE" | awk -F'|' -v t="$1" -v sel="$SELECTED" \
-    'BEGIN{n=split(sel,s," "); for(i=1;i<=n;i++) ok[s[i]]=1} NF && $2==t && ok[$1] {print $3 "|" $4}'
+  echo "$CATALOGUE" | awk -F'|' -v t="$1" -v sel="$SELECTED" -v noecc="$NO_ECC" \
+    'BEGIN{n=split(sel,s," "); for(i=1;i<=n;i++) ok[s[i]]=1}
+     NF && $2==t && ok[$1] && !(noecc==1 && $3 ~ /^ecc(@|$)/) {print $3 "|" $4}'
 }
 
 install_agents_md() {
@@ -152,16 +169,10 @@ claude_setup() {
       [ -z "$name" ] && continue
       if grep -qE "❯ ${name}\$" <<<"$markets"; then echo "marketplace $name already added"; else run claude plugin marketplace add "$value"; fi
     done < <(entries market)
-    if [ "$WITH_ECC" = 1 ]; then
-      grep -qE "❯ ecc\$" <<<"$markets" || run claude plugin marketplace add "$ECC_MARKET"
-    fi
     while IFS='|' read -r name value; do
       [ -z "$name" ] && continue
       if grep -qE "❯ ${name}\$" <<<"$plugins"; then echo "plugin $name already installed"; else run claude plugin install "$name" --scope user; fi
     done < <(entries plugin)
-    if [ "$WITH_ECC" = 1 ]; then
-      grep -q "❯ ecc@ecc" <<<"$plugins" || run claude plugin install ecc@ecc --scope user
-    fi
   fi
 
   if [ "$DO_MCP" = 1 ]; then
@@ -194,12 +205,15 @@ codex_setup() {
   have codex || { echo "codex CLI not found: npm install -g @openai/codex" >&2; FAILED+=("codex CLI missing"); return; }
 
   if [ "$DO_PLUGINS" = 1 ]; then
-    run codex plugin marketplace add DietrichGebert/ponytail
-    run codex plugin add ponytail@ponytail
-    if [ "$WITH_ECC" = 1 ]; then
-      run codex plugin marketplace add "$ECC_MARKET"
-      run codex plugin add ecc@ecc
-    fi
+    local cname cvalue
+    while IFS='|' read -r cname cvalue; do
+      [ -z "$cname" ] && continue
+      run codex plugin marketplace add "$cvalue"
+    done < <(entries cmarket)
+    while IFS='|' read -r cname cvalue; do
+      [ -z "$cname" ] && continue
+      run codex plugin add "$cname"
+    done < <(entries cplugin)
     echo "NOTE: open /hooks in Codex, trust the plugin hooks, start a new thread."
   fi
 
@@ -212,6 +226,13 @@ codex_setup() {
         run codex mcp add "$name" -- $value
       fi
     done < <(entries mcp)
+    while IFS='|' read -r name value; do
+      [ -z "$name" ] && continue
+      if grep -qE "^$name( |\$)" <<<"$existing"; then echo "mcp $name already configured"; else
+        # shellcheck disable=SC2086
+        run codex mcp add "$name" -- $value
+      fi
+    done < <(entries cmcp)
     case " $SELECTED " in *" dev "*)
       if [ -n "${GITHUB_PERSONAL_ACCESS_TOKEN:-}" ]; then
         grep -qE "^github( |\$)" <<<"$existing" || \
