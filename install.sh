@@ -5,7 +5,7 @@ set -uo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-ALL_CATEGORIES="dev design video audio docs productivity jobs learning finance agents security"
+ALL_CATEGORIES="dev design video audio docs agents security"
 
 # ---------------------------------------------------------------------------
 # Catalogue. One entry per line:  category|type|name|value
@@ -53,16 +53,6 @@ docs|mcp|pdf|npx -y @modelcontextprotocol/server-pdf --stdio
 docs|remote|claude-docs|https://api.anthropic.com/v1/pages/mcp
 docs|remote|google-drive|https://drivemcp.googleapis.com/mcp/v1
 docs|remote|goodnotes|https://claude-mcp-api.ml.goodnotes.com/mcp
-productivity|remote|gmail|https://gmailmcp.googleapis.com/mcp/v1
-productivity|remote|google-calendar|https://calendarmcp.googleapis.com/mcp/v1
-productivity|remote|slack|https://mcp.slack.com/mcp
-productivity|remote|agentmail|https://mcp.agentmail.to/mcp
-jobs|remote|indeed|https://mcp.indeed.com/claude/mcp
-jobs|remote|dice|https://mcp.dice.com/mcp
-jobs|remote|ziprecruiter|https://api.ziprecruiter.com/mcp
-jobs|remote|jobdatalake|https://mcp.jobdatalake.com
-jobs|remote|jobs-and-careers|https://jobs-and-careers-gpt-app.sonicapply.com/mcp
-learning|remote|coursera|https://api.coursera.com/mcp
 agents|market|ruflo|ruvnet/ruflo
 agents|plugin|ruflo-core@ruflo|
 agents|plugin|ruflo-console@ruflo|
@@ -85,7 +75,7 @@ Targets (default: both)
   --codex               set up Codex only (app, CLI and IDE extension share ~/.codex/config.toml)
 
 Categories (default: core + every category). Passing any category flag installs core + only those.
-  --dev --design --video --audio --docs --productivity --jobs --learning --finance --agents --security
+  --dev --design --video --audio --docs --agents --security
   --list                print the catalogue per category and exit
 
 Parts (default: all)
@@ -100,7 +90,7 @@ Extras
   -h, --help
 
 Env: GITHUB_PERSONAL_ACCESS_TOKEN enables the github MCP server (dev category).
-Categories without installer entries (finance) are account-synced: see README.md.
+Account-synced plugins/connectors have no installer entries: see README.md.
 USAGE
 }
 
@@ -110,7 +100,7 @@ for a in "$@"; do
   case "$a" in
     --claude) DO_CODEX=0 ;;
     --codex) DO_CLAUDE=0 ;;
-    --dev|--design|--video|--audio|--docs|--productivity|--jobs|--learning|--finance|--agents|--security) add_cat "${a#--}" ;;
+    --dev|--design|--video|--audio|--docs|--agents|--security) add_cat "${a#--}" ;;
     --plugins-only) DO_MCP=0; DO_CONFIG=0 ;;
     --mcp-only) DO_PLUGINS=0; DO_CONFIG=0 ;;
     --config-only) DO_PLUGINS=0; DO_MCP=0 ;;

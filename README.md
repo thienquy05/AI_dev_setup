@@ -54,7 +54,7 @@ export GITHUB_PERSONAL_ACCESS_TOKEN=ghp_xxx   # optional, enables the github MCP
 | `./install.sh --list` | print the catalogue per category |
 | `./install.sh --dry-run` | print commands, change nothing |
 
-Category flags: `--dev --design --video --audio --docs --productivity --jobs --learning --finance --agents --security`.
+Category flags: `--dev --design --video --audio --docs --agents --security`.
 
 After installing:
 - Restart Claude Code / Codex.
@@ -138,40 +138,6 @@ Installer column: **script** = installed by `install.sh`; **account** = synced f
 | goodnotes | remote MCP, `https://claude-mcp-api.ml.goodnotes.com/mcp` | account / `--with-connectors` | Access Goodnotes notes. |
 | docx, pdf, pptx, xlsx, docs, google-workspace, deep-research, skill-creator, import-memory, morning | Anthropic built-in skills | account | Create/edit Word, PDF, PowerPoint, Excel and Google files; multi-source research reports; skill authoring. |
 
-### productivity (`--productivity`)
-
-| Tool | Type | Installer | Purpose |
-|---|---|---|---|
-| gmail | remote MCP, `https://gmailmcp.googleapis.com/mcp/v1` | account / `--with-connectors` | Search, read, draft and send mail. |
-| google-calendar | remote MCP, `https://calendarmcp.googleapis.com/mcp/v1` | account / `--with-connectors` | Read and manage events. |
-| slack | remote MCP, `https://mcp.slack.com/mcp` | account / `--with-connectors` | Read and post in Slack. |
-| agentmail | remote MCP, `https://mcp.agentmail.to/mcp` | account / `--with-connectors` | Agent-owned inboxes and third-party app sign-ups. |
-
-### jobs (`--jobs`)
-
-| Tool | Type | Installer | Purpose |
-|---|---|---|---|
-| indeed | remote MCP, `https://mcp.indeed.com/claude/mcp` | account / `--with-connectors` | Job search, company data, resume. |
-| dice | remote MCP, `https://mcp.dice.com/mcp` | account / `--with-connectors` | Job search and company lookup. |
-| ziprecruiter | remote MCP, `https://api.ziprecruiter.com/mcp` | account / `--with-connectors` | Job search. |
-| jobdatalake | remote MCP, `https://mcp.jobdatalake.com` | account / `--with-connectors` | Search 1M+ enriched job listings; salary, skills, location filters. |
-| jobs-and-careers | remote MCP, `https://jobs-and-careers-gpt-app.sonicapply.com/mcp` | account / `--with-connectors` | Job search. |
-
-### learning (`--learning`)
-
-| Tool | Type | Installer | Purpose |
-|---|---|---|---|
-| coursera | remote MCP, `https://api.coursera.com/mcp` | account / `--with-connectors` | Search courses, videos and hands-on projects; read course material. |
-
-### finance (`--finance`)
-
-| Tool | Type | Installer | Purpose |
-|---|---|---|---|
-| finance | plugin | account | Skills: audit-support, close-management, financial-statements, journal-entry, reconciliation, sox-testing, variance-analysis. Bundles BigQuery, Snowflake, Databricks connectors. |
-| investment-banking | plugin | account | Skills: buyer-list, CIM, deal-tracker, merger-model, one-pager, process-letter, teaser, datapack-builder, pitch-deck, strip-profile. |
-
-No script installer exists for this category.
-
 ### agents (`--agents`)
 
 | Tool | Type | Installer | Purpose |
@@ -199,8 +165,6 @@ Codex-only install: `./install.sh --codex` (add `--with-connectors` for remote s
 | video | remotion skill pack | `ffmpeg-llm`, `watch-video`, `video-to-code-skill` (claude.ai account only) |
 | audio | elevenlabs via `--with-connectors` | `transcribe-so` plugin |
 | docs | pdf; claude-docs, google-drive, goodnotes via `--with-connectors` | `pdf-viewer`, Anthropic built-in skills |
-| productivity, jobs, learning | all remote servers via `--with-connectors` | none |
-| finance | none | `finance`, `investment-banking` plugins |
 | agents | ruflo MCP | `ruflo-core`, `ruflo-console`, `ruflo-mods` (Claude Code mods) |
 | security | rea | none |
 
@@ -348,16 +312,16 @@ Applications that are not plugins or MCP servers and are installed by hand.
 
 Plugins and connectors marked **account** sync when Claude Code is signed in to the same claude.ai account. They cannot be installed from a repository.
 
-- Plugins: `engineering`, `design`, `finance`, `investment-banking`, `pdf-viewer`, `transcribe-so`, `ffmpeg-llm`, `video-to-code-skill`, `watch-video`, `cowork-plugin-management`.
+- Plugins: `engineering`, `design`, `pdf-viewer`, `transcribe-so`, `ffmpeg-llm`, `video-to-code-skill`, `watch-video`, `cowork-plugin-management`.
 - Connectors: enable in claude.ai → Settings → Connectors. URLs are listed per category in section 4.
-- Plugin-bundled MCP entries (`plugin:engineering:*`, `plugin:design:*`, `plugin:finance:*`) show "Needs authentication" until authorized in Claude Code. Asana reports "does not support dynamic client registration"; this is a server limitation.
+- Plugin-bundled MCP entries (`plugin:engineering:*`, `plugin:design:*`) show "Needs authentication" until authorized in Claude Code. Asana reports "does not support dynamic client registration"; this is a server limitation.
 - Remote connector URLs were taken from Claude Code. Authorization from Codex is not guaranteed for every server (some are issued for claude.ai only); a failure is reported at the end of the run and does not stop other steps.
 
 ## 11. Excluded items
 
 | Item | Reason |
 |---|---|
-| Robinhood, Intuit TurboTax connectors | Access financial accounts; not published in a public repository. Add manually. |
+| productivity, jobs, learning, finance categories | Removed: not needed for development (Gmail, Calendar, Slack, AgentMail; Indeed, Dice, ZipRecruiter, JobDataLake, Jobs and Careers; Coursera; `finance`, `investment-banking`; Robinhood, Intuit TurboTax). Connectors and synced plugins that are enabled on the claude.ai account still load in Claude Code; disable them in claude.ai → Settings → Connectors and Plugins to remove them. |
 | harness-os | Docker MCP bound to local `~/Project/harness_os` and a local Postgres (`DATABASE_URL` in its command). |
 | `permissions.allow`, per-project paths | Project-specific. |
 

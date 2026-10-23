@@ -28,6 +28,4 @@ Edit it here, then re-run `./install.sh --config-only`.
 - agents: ruflo (swarms, orchestration). security: rea (reverse engineering; authorized targets only).
 - video / audio: remotion (React video, skill pack), ffmpeg-llm, watch-video, transcribe-so, ElevenLabs.
 - docs: pdf, Claude Docs, Google Drive, docx/pdf/pptx/xlsx skills.
-- productivity, jobs, learning, finance: Gmail, Calendar, Slack, AgentMail; Indeed, Dice, ZipRecruiter,
-  JobDataLake; Coursera; finance and investment-banking skills.
 - Only use a tool that is actually connected in the current session; do not assume the full list is present.
