@@ -29,6 +29,8 @@ core|market|openai-codex|openai/codex-plugin-cc
 core|plugin|ponytail@ponytail|
 core|plugin|code-review@claude-plugins-official|
 core|plugin|codex@openai-codex|
+core|plugin|claude-md-management@claude-plugins-official|
+core|plugin|claude-code-setup@claude-plugins-official|
 core|market|ecc|affaan-m/ECC
 core|plugin|ecc@ecc|
 core|cmarket|ponytail|DietrichGebert/ponytail
@@ -38,6 +40,9 @@ core|cplugin|ecc@ecc|
 core|mcp|context7|npx -y @upstash/context7-mcp@latest
 core|mcp|sequential-thinking|npx -y @modelcontextprotocol/server-sequential-thinking
 core|mcp|memory|npx -y @modelcontextprotocol/server-memory
+dev|plugin|feature-dev@claude-plugins-official|
+dev|plugin|plugin-dev@claude-plugins-official|
+dev|plugin|supabase@claude-plugins-official|
 dev|mcp|playwright|npx -y @playwright/mcp --browser chrome
 dev|mcp|token-optimizer|npx -y token-optimizer-mcp
 dev|cmcp|chrome-devtools|npx -y chrome-devtools-mcp@1.10.1
@@ -58,6 +63,8 @@ agents|plugin|ruflo-core@ruflo|
 agents|plugin|ruflo-console@ruflo|
 agents|plugin|ruflo-mods@ruflo|
 agents|cmcp|ruflo|npx -y ruflo@latest mcp start
+security|plugin|security-guidance@claude-plugins-official|
+security|plugin|claude-security@claude-plugins-official|
 security|mcp|rea|npx -y rea-agents@6.5.0 mcp
 '
 
