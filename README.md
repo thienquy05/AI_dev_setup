@@ -33,7 +33,7 @@ export GITHUB_PERSONAL_ACCESS_TOKEN=ghp_xxx   # optional, enables the github MCP
 | Codex CLI | `codex plugin`, `codex mcp` (the Codex app and IDE extension read the same `~/.codex/config.toml`) | `npm install -g @openai/codex`, then `codex login` |
 | Google Chrome | `playwright` MCP (`--browser chrome`) | `brew install --cask google-chrome` |
 | GitHub token (optional) | `github` MCP | https://github.com/settings/tokens |
-| Node.js 22.20+ | `skills` CLI used for the Remotion skill pack | `brew install node` |
+| Node.js 22.20+ | `skills` CLI used for the Remotion and Hallmark skill packs | `brew install node` |
 | Claude Code 2.1.287+ | `agents` category (ruflo mods) | `claude update` |
 | Python 3 | `ui-ux-pro-max` search scripts | `brew install python` |
 | ffmpeg, yt-dlp (video category) | `ffmpeg-llm`, `watch-video` | `brew install ffmpeg yt-dlp` |
@@ -110,6 +110,7 @@ Installer column: **script** = installed by `install.sh`; **account** = synced f
 |---|---|---|---|
 | magic | MCP, `@magicuidesign/mcp` | script | Magic UI component library: look up and generate animated React/Tailwind components. |
 | ui-ux-pro-max | plugin, [nextlevelbuilder/ui-ux-pro-max-skill](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) | script (Claude Code) | UI/UX design intelligence skill: searchable databases of 79 styles, 192 palettes, 74 font pairings, 25 chart types and 22 stack guidelines (React, Next.js, Vue, Svelte, SwiftUI, Flutter, Tailwind, shadcn/ui and others). Requires Python 3. Codex: installed by the script as a skill in `~/.agents/skills/` (`npx -y ui-ux-pro-max-cli init --ai universal --global`). |
+| hallmark | skill, [nutlope/hallmark](https://github.com/nutlope/hallmark) (MIT, by Together AI) | script (Claude Code + Codex, user scope) | Anti-AI-slop design skill for building new pages. Deals three themes from a catalogue of 50, builds the page around the visitor's job, then lints it in a real browser (`sloplint --render`: contrast, focus rings, phone layout, invented facts, empty frames) and has a fresh-context reviewer sign off. `/hallmark <prompt>` (Codex: `$hallmark`), `/hallmark redesign <path>` (keeps content and wiring), `/hallmark audit <path>` (report only), or say *custom* to drop the themes. Output is self-contained HTML/CSS and is not framework-aware by default. Optional extras: browser checks need `npm i -g puppeteer-core` and Chrome; AI image generation needs `TOGETHER_API_KEY` (not set up here). Only invoked on new designs or when named, so it does not touch existing pages unprompted. |
 | excalidraw | remote MCP, `https://mcp.excalidraw.com/mcp` | account (Claude Code), script `--with-connectors` (Codex) | Create diagrams and whiteboard drawings. |
 | design | plugin | account | Skills: accessibility-review (WCAG 2.1 AA), design-critique, design-handoff, design-system, research-synthesis, user-research, ux-copy. Bundles connectors for Figma, Asana, Intercom, Linear, Notion, Slack, Atlassian (each needs authorization). |
 
@@ -167,7 +168,7 @@ Codex-only install: `./install.sh --codex` (add `--with-connectors` for remote s
 |---|---|---|
 | core | ponytail, ECC, context7, sequential-thinking, memory, shared `AGENTS.md` | `code-review` (Codex has built-in `/review`), `claude-md-management`, `claude-code-setup`, `codex` bridge plugin (Claude Code only), account-synced plugins |
 | dev | playwright, chrome-devtools, token-optimizer, github (with token); vercel via `--with-connectors` | `feature-dev`, `plugin-dev`, `supabase`, `engineering` plugin |
-| design | magic, ui-ux-pro-max skill; excalidraw via `--with-connectors` | `design` plugin |
+| design | magic, ui-ux-pro-max skill, hallmark skill pack; excalidraw via `--with-connectors` | `design` plugin |
 | video | remotion skill pack | `ffmpeg-llm`, `watch-video`, `video-to-code-skill` (claude.ai account only) |
 | audio | elevenlabs via `--with-connectors` | `transcribe-so` plugin |
 | docs | pdf; claude-docs, google-drive, goodnotes via `--with-connectors` | `pdf-viewer`, Anthropic built-in skills |
@@ -207,6 +208,7 @@ claude plugin install supabase@claude-plugins-official --scope user
 claude mcp add --scope user magic -- npx -y @magicuidesign/mcp@latest
 claude plugin marketplace add nextlevelbuilder/ui-ux-pro-max-skill
 claude plugin install ui-ux-pro-max@ui-ux-pro-max-skill --scope user
+npx -y skills add nutlope/hallmark -g -a claude-code -s '*' -y
 
 # video
 npx -y skills add remotion-dev/skills -g -a claude-code -s '*' -y
@@ -251,6 +253,7 @@ codex mcp add github --env GITHUB_PERSONAL_ACCESS_TOKEN=ghp_xxx -- npx -y @model
 # design
 codex mcp add magic -- npx -y @magicuidesign/mcp@latest
 npx -y ui-ux-pro-max-cli init --ai universal --global   # installs the skill into ~/.agents/skills/ (read by Codex)
+npx -y skills add nutlope/hallmark -g -a codex -s '*' -y
 
 # agents
 codex mcp add ruflo -- npx -y ruflo@latest mcp start

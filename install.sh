@@ -51,6 +51,7 @@ design|mcp|magic|npx -y @magicuidesign/mcp@latest
 design|market|ui-ux-pro-max-skill|nextlevelbuilder/ui-ux-pro-max-skill
 design|plugin|ui-ux-pro-max@ui-ux-pro-max-skill|
 design|cskill|ui-ux-pro-max|npx -y ui-ux-pro-max-cli init --ai universal --global
+design|agentskill|hallmark|nutlope/hallmark
 design|remote|excalidraw|https://mcp.excalidraw.com/mcp
 video|agentskill|remotion|remotion-dev/skills
 audio|remote|elevenlabs|https://api.elevenlabs.io/v1/mcp
