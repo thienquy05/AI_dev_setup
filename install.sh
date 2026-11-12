@@ -145,10 +145,18 @@ entries() {
 
 install_agents_md() {
   local dst="$HOME/.codex/AGENTS.md"
-  [ "$DRY" = 1 ] && { echo "+ copy shared/AGENTS.md -> $dst"; return; }
+  [ "$DRY" = 1 ] && { echo "+ copy shared/AGENTS.md -> $dst"; install_templates; return; }
   mkdir -p "$HOME/.codex"
   [ -f "$dst" ] && ! cmp -s "$dst" "$ROOT/shared/AGENTS.md" && cp "$dst" "$dst.bak"
   cp "$ROOT/shared/AGENTS.md" "$dst" && echo "wrote $dst"
+  install_templates
+}
+
+# Project templates live at a stable path so any project can adopt them (see shared/AGENTS.md).
+install_templates() {
+  local tdst="$HOME/.codex/templates"
+  [ "$DRY" = 1 ] && { echo "+ copy templates/ -> $tdst"; return; }
+  rm -rf "$tdst" && cp -R "$ROOT/templates" "$tdst" && echo "wrote $tdst"
 }
 
 install_claude_md() {

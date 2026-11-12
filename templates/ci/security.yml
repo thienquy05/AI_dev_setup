@@ -1,0 +1,59 @@
+# Template: security checks on every PR and weekly (docs/process/SECURITY_GATE.md §1).
+# Adapt before use:
+#  - replace every <SHA> with the full commit SHA of that action's release (official GitHub page);
+#  - code scanning: keep CodeQL for public repos (free) or Semgrep OSS for private repos; delete the other;
+#  - set CodeQL "languages" to the project's languages;
+#  - Gitleaks: the official action needs a free license key for organization-owned repos; personal repos do not.
+name: security
+
+on:
+  pull_request:
+  push:
+    branches: [main, master]
+  schedule:
+    - cron: "17 6 * * 1"
+
+permissions:
+  contents: read
+
+jobs:
+  secrets:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@<SHA>
+        with:
+          fetch-depth: 0   # scan full history
+      - uses: gitleaks/gitleaks-action@<SHA>
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  dependencies:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@<SHA>
+      # One scanner for every lockfile in the repo (npm, pip/uv, Go, Cargo, ...).
+      - uses: google/osv-scanner-action/osv-scanner-action@<SHA>
+        with:
+          scan-args: |-
+            --recursive
+            ./
+
+  codeql:   # public repos
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - uses: actions/checkout@<SHA>
+      - uses: github/codeql-action/init@<SHA>
+        with:
+          languages: javascript-typescript   # e.g. python, go, java-kotlin
+      - uses: github/codeql-action/analyze@<SHA>
+
+  semgrep:  # private repos
+    runs-on: ubuntu-latest
+    container:
+      image: semgrep/semgrep@sha256:<DIGEST>
+    steps:
+      - uses: actions/checkout@<SHA>
+      - run: semgrep scan --config p/default --error --metrics off

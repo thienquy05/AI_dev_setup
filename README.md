@@ -19,10 +19,9 @@ export GITHUB_PERSONAL_ACCESS_TOKEN=ghp_xxx   # optional, enables the github MCP
 6. [Manual commands](#6-manual-commands)
 7. [Configuration files](#7-configuration-files)
 8. [Shared AGENTS.md](#8-shared-agentsmd)
-9. [Optional apps](#9-optional-apps)
-10. [Account-synced items](#10-account-synced-items)
-11. [Troubleshooting](#11-troubleshooting)
-12. [Maintenance](#12-maintenance)
+9. [Account-synced items](#9-account-synced-items)
+10. [Troubleshooting](#10-troubleshooting)
+11. [Maintenance](#11-maintenance)
 
 ## 1. Requirements
 
@@ -66,13 +65,40 @@ After installing:
 2. **MCP servers** expose tools to the agent. Local servers run through `npx` over stdio; remote servers are HTTPS URLs authorized with OAuth. `claude mcp add` / `codex mcp add` store how to reach them.
 3. **Catalogue**: `install.sh` holds one table (`category|type|name|value`). Types: `market`, `plugin`, `mcp`, `remote`. Category flags filter this table.
 4. **Settings merge**: `scripts/merge-json.mjs` merges `claude/settings.base.json` into `~/.claude/settings.json`. Objects merge recursively, arrays are unioned, existing values are never overwritten, and a `.bak` copy is written first.
-5. **Shared instructions**: `shared/AGENTS.md` is copied to `~/.codex/AGENTS.md`; `~/.claude/CLAUDE.md` receives the line `@~/.codex/AGENTS.md`.
+5. **Shared instructions**: `shared/AGENTS.md` is copied to `~/.codex/AGENTS.md`; `~/.claude/CLAUDE.md` receives the line `@~/.codex/AGENTS.md`; `templates/` is copied to `~/.codex/templates/`.
 6. **Idempotency**: each step checks `list` output first and skips existing entries. Failed steps are listed at the end and the exit code is non-zero.
 7. **Claude vs Codex remote connectors**: Claude Code receives claude.ai connectors from the signed-in account, so the script only adds remote connectors to Codex.
 
+### Repository layout
+
+```text
+AI_dev_setup/
+├── install.sh                      installer: tool catalogue, category flags, settings merge, AGENTS.md and templates deploy
+├── README.md                       this file
+├── .env.example                    names of the optional environment variables (copy to .env; no secrets committed)
+├── .gitignore                      keeps .env, *.bak and .DS_Store out of git
+├── claude/
+│   └── settings.base.json          Claude Code defaults merged into ~/.claude/settings.json (model, plugins, marketplaces)
+├── codex/
+│   └── config.snippet.toml         MCP servers to append to ~/.codex/config.toml by hand instead of `codex mcp add`
+├── scripts/
+│   └── merge-json.mjs              deep-merges the base settings into the target without overwriting existing values
+├── shared/
+│   └── AGENTS.md                   global instructions for Claude Code and Codex, deployed to ~/.codex/AGENTS.md
+└── templates/                      project-neutral starting points for a new repository (deployed to ~/.codex/templates/)
+    ├── README.md                   how to adopt the templates, plus the new-project kickoff prompt
+    ├── AGENTS.template.md          the one instruction file for a project; fill in the [PLACEHOLDERS]
+    ├── CLAUDE.template.md          one line that makes Claude Code load AGENTS.md
+    ├── gitignore.base              lines every repo needs for agent state, secrets and caches
+    ├── process/                    the working process: harness process, PRD templates, testing, review, security gate, cleanup
+    ├── scripts/                    check.sh (parallel checks), run-bg.sh (tracked background processes), janitor.sh (leftovers); tests/ holds selfcheck.sh
+    ├── claude/                     settings.template.json (sandbox and permissions) and agents/reviewer.md (read-only reviewer)
+    └── ci/                         GitHub Actions starting points: gate.yml (fast checks) and security.yml
+```
+
 ## 4. Categories
 
-Installer column: **script** = installed by `install.sh`; **account** = synced from the claude.ai account (see [section 10](#10-account-synced-items)).
+Installer column: **script** = installed by `install.sh`; **account** = synced from the claude.ai account (see [section 9](#9-account-synced-items)).
 
 ### core (always installed)
 
@@ -303,25 +329,11 @@ Not copied: `permissions.allow` (project-specific paths) and `statusLine` (hard-
 - Edit `shared/AGENTS.md`, then run `./install.sh --config-only` to redeploy.
 - Per-project override: add `AGENTS.md` to the repository (Codex) and a `CLAUDE.md` containing `@AGENTS.md` (Claude Code).
 
-## 9. Optional apps
+### Project templates
 
-Applications that are not plugins or MCP servers and are installed by hand.
+[`templates/`](templates/) holds general, project-neutral starting points for a new repository: `AGENTS.template.md`, a process set (PRD, plan, testing, review, security gate, cleanup), helper scripts (`check.sh`, `run-bg.sh`, `janitor.sh`), a sandboxed `settings.template.json`, one read-only `reviewer` subagent, CI starting points and a base `.gitignore`. `install.sh` (also with `--config-only`) copies them to `~/.codex/templates/`, and the shared `AGENTS.md` tells every agent to offer them when a project is new (empty repo or no `AGENTS.md`). The agent copies and adapts what it needs, following [`templates/README.md`](templates/README.md), and you approve the result; existing projects are left alone. Edit `templates/` here, then re-run `./install.sh --config-only` to redeploy. Check the scripts with `bash templates/scripts/tests/selfcheck.sh`.
 
-### Harp (macOS terminal for multiple agents)
-
-[dominikmartn/harp](https://github.com/dominikmartn/harp): unofficial fork of the open-source Warp terminal with a sidebar for running several Claude Code and Codex sessions at once.
-
-| Item | Detail |
-|---|---|
-| Shows | Per-session state (working, waiting for you, done, background work, set aside), named tab groups, and two usage rings per provider (5-hour and weekly limits) |
-| Install | Download `Harp-<version>.dmg` from the repo's Releases page and drag to Applications; or build from source: `./script/bootstrap && ./script/run` (Rust toolchain) |
-| Settings | `~/.harp/settings.toml` (tmux sync, limit-ring file, menu options); runs next to Warp with its own bundle id and settings folder |
-| Claude Code integration | On first start, if `~/.claude/settings.json` has no `statusLine`, Harp adds one that writes `~/.harp/claude-statusline.json`. An existing `statusLine` is left unchanged; to keep it and get the rings, pipe through `tee ~/.harp/claude-statusline.json \| your-command`. Rings work for Claude.ai plans, not API keys. |
-| Codex integration | Limit rings read `~/.codex/sessions` |
-| Cost | Free; AGPL-3.0 (the `warpui` crates are MIT). Warp's own AI and cloud features, if used, talk to Warp's servers under Warp's terms; Harp adds no servers. Logging in through Harp is untested upstream. |
-| Platform | macOS only |
-
-## 10. Account-synced items
+## 9. Account-synced items
 
 Plugins and connectors marked **account** sync when Claude Code is signed in to the same claude.ai account. They cannot be installed from a repository.
 
@@ -330,7 +342,7 @@ Plugins and connectors marked **account** sync when Claude Code is signed in to 
 - Plugin-bundled MCP entries (`plugin:engineering:*`, `plugin:design:*`) show "Needs authentication" until authorized in Claude Code. Asana reports "does not support dynamic client registration"; this is a server limitation.
 - Remote connector URLs were taken from Claude Code. Authorization from Codex is not guaranteed for every server (some are issued for claude.ai only); a failure is reported at the end of the run and does not stop other steps.
 
-## 11. Troubleshooting
+## 10. Troubleshooting
 
 | Symptom | Action |
 |---|---|
@@ -343,7 +355,7 @@ Plugins and connectors marked **account** sync when Claude Code is signed in to 
 | ECC duplicated skills or hooks | Follow "Reset / Uninstall ECC" in the ECC README; do not mix plugin and manual installs. |
 | Restore previous config | `~/.claude/settings.json.bak`, `~/.codex/AGENTS.md.bak`. |
 
-## 12. Maintenance
+## 11. Maintenance
 
 1. Capture the current state: `claude plugin marketplace list`, `claude plugin list`, `claude mcp list`, `codex mcp list`, `cat ~/.codex/config.toml`.
 2. Add new items as a row in the `CATALOGUE` block of `install.sh` (`category|type|name|value`).
