@@ -69,6 +69,33 @@ After installing:
 6. **Idempotency**: each step checks `list` output first and skips existing entries. Failed steps are listed at the end and the exit code is non-zero.
 7. **Claude vs Codex remote connectors**: Claude Code receives claude.ai connectors from the signed-in account, so the script only adds remote connectors to Codex.
 
+### Repository layout
+
+```text
+AI_dev_setup/
+├── install.sh                      installer: tool catalogue, category flags, settings merge, AGENTS.md and templates deploy
+├── README.md                       this file
+├── .env.example                    names of the optional environment variables (copy to .env; no secrets committed)
+├── .gitignore                      keeps .env, *.bak and .DS_Store out of git
+├── claude/
+│   └── settings.base.json          Claude Code defaults merged into ~/.claude/settings.json (model, plugins, marketplaces)
+├── codex/
+│   └── config.snippet.toml         MCP servers to append to ~/.codex/config.toml by hand instead of `codex mcp add`
+├── scripts/
+│   └── merge-json.mjs              deep-merges the base settings into the target without overwriting existing values
+├── shared/
+│   └── AGENTS.md                   global instructions for Claude Code and Codex, deployed to ~/.codex/AGENTS.md
+└── templates/                      project-neutral starting points for a new repository (deployed to ~/.codex/templates/)
+    ├── README.md                   how to adopt the templates, plus the new-project kickoff prompt
+    ├── AGENTS.template.md          the one instruction file for a project; fill in the [PLACEHOLDERS]
+    ├── CLAUDE.template.md          one line that makes Claude Code load AGENTS.md
+    ├── gitignore.base              lines every repo needs for agent state, secrets and caches
+    ├── process/                    the working process: harness process, PRD templates, testing, review, security gate, cleanup
+    ├── scripts/                    check.sh (parallel checks), run-bg.sh (tracked background processes), janitor.sh (leftovers); tests/ holds selfcheck.sh
+    ├── claude/                     settings.template.json (sandbox and permissions) and agents/reviewer.md (read-only reviewer)
+    └── ci/                         GitHub Actions starting points: gate.yml (fast checks) and security.yml
+```
+
 ## 4. Categories
 
 Installer column: **script** = installed by `install.sh`; **account** = synced from the claude.ai account (see [section 9](#9-account-synced-items)).
