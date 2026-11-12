@@ -1,0 +1,53 @@
+# --- from Templates/gitignore.base: append to .gitignore, skip lines already present ---
+
+# Secrets and credentials
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+secrets/
+credentials*.json
+
+# Agent tool state (may hold memory databases, transcripts or local paths)
+.handoff/
+.claude/settings.local.json
+.claude/proven-config.json
+.claude/.proven-config-version
+.claude/.cc-writes/
+.claude/worktrees/
+.claude-flow/
+.swarm/
+.hive-mind/
+agentdb.rvf*
+ruvector.db
+graphify-out/
+.playwright-mcp/
+.codex/
+
+# Caches, build output, test output
+.cache/
+node_modules/
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.hypothesis/
+dist/
+build/
+out/
+coverage/
+.coverage
+test-results/
+playwright-report/
+*.tsbuildinfo
+*.log
+
+# OS and editors
+.DS_Store
+*:Zone.Identifier
+.vscode/
+.idea/

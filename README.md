@@ -65,7 +65,7 @@ After installing:
 2. **MCP servers** expose tools to the agent. Local servers run through `npx` over stdio; remote servers are HTTPS URLs authorized with OAuth. `claude mcp add` / `codex mcp add` store how to reach them.
 3. **Catalogue**: `install.sh` holds one table (`category|type|name|value`). Types: `market`, `plugin`, `mcp`, `remote`. Category flags filter this table.
 4. **Settings merge**: `scripts/merge-json.mjs` merges `claude/settings.base.json` into `~/.claude/settings.json`. Objects merge recursively, arrays are unioned, existing values are never overwritten, and a `.bak` copy is written first.
-5. **Shared instructions**: `shared/AGENTS.md` is copied to `~/.codex/AGENTS.md`; `~/.claude/CLAUDE.md` receives the line `@~/.codex/AGENTS.md`.
+5. **Shared instructions**: `shared/AGENTS.md` is copied to `~/.codex/AGENTS.md`; `~/.claude/CLAUDE.md` receives the line `@~/.codex/AGENTS.md`; `templates/` is copied to `~/.codex/templates/`.
 6. **Idempotency**: each step checks `list` output first and skips existing entries. Failed steps are listed at the end and the exit code is non-zero.
 7. **Claude vs Codex remote connectors**: Claude Code receives claude.ai connectors from the signed-in account, so the script only adds remote connectors to Codex.
 
@@ -284,6 +284,10 @@ Not copied: `permissions.allow` (project-specific paths) and `statusLine` (hard-
 - Claude Code reads `~/.claude/CLAUDE.md`, which imports it with `@~/.codex/AGENTS.md`.
 - Edit `shared/AGENTS.md`, then run `./install.sh --config-only` to redeploy.
 - Per-project override: add `AGENTS.md` to the repository (Codex) and a `CLAUDE.md` containing `@AGENTS.md` (Claude Code).
+
+### Project templates
+
+[`templates/`](templates/) holds general, project-neutral starting points for a new repository: `AGENTS.template.md`, a process set (PRD, plan, testing, review, security gate, cleanup), helper scripts (`check.sh`, `run-bg.sh`, `janitor.sh`), a sandboxed `settings.template.json`, one read-only `reviewer` subagent, CI starting points and a base `.gitignore`. `install.sh` (also with `--config-only`) copies them to `~/.codex/templates/`, and the shared `AGENTS.md` tells every agent to offer them when a project is new (empty repo or no `AGENTS.md`). The agent copies and adapts what it needs, following [`templates/README.md`](templates/README.md), and you approve the result; existing projects are left alone. Edit `templates/` here, then re-run `./install.sh --config-only` to redeploy. Check the scripts with `bash templates/scripts/tests/selfcheck.sh`.
 
 ## 9. Account-synced items
 

@@ -1,0 +1,53 @@
+# Template: one required "gate" check that runs the project's fast checks on every PR.
+# Adapt before use:
+#  - keep the job for the project's stack, delete the other, and update "needs" in the gate job;
+#  - replace every <SHA> with the full commit SHA of that action's release (look it up on the action's
+#    official GitHub page; never use a moving tag such as @v4 or @main);
+#  - make "gate" a required status check on the default branch.
+name: gate
+
+on:
+  pull_request:
+  push:
+    branches: [main, master]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: gate-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  node:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@<SHA>
+      - uses: actions/setup-node@<SHA>
+        with:
+          node-version-file: .nvmrc   # or node-version: "<VERSION>"
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck --if-present
+      - run: npm run lint --if-present
+      - run: npm test
+
+  python:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@<SHA>
+      - uses: astral-sh/setup-uv@<SHA>
+      - run: uv sync --frozen
+      - run: uv run ruff check . && uv run ruff format --check .
+      - run: uv run pytest -q
+
+  gate:
+    # The single required check: green only if every job above is green.
+    needs: [node, python]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          [ "${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') }}" = "false" ]

@@ -20,6 +20,12 @@ Edit it here, then re-run `./install.sh --config-only`.
 - Work on a feature branch. Never push directly to `main`/`master`.
 - Small, focused commits with a clear message. Only commit or push when asked.
 
+## New projects
+- When a project is new (empty repo, or no `AGENTS.md`), offer to adopt `~/.codex/templates/` and ask before copying.
+  Follow its `README.md`: read the project first, merge instead of overwriting, replace every `[PLACEHOLDER]`,
+  and let the owner approve the result.
+- Existing projects keep their own `AGENTS.md`; do not apply the templates unasked.
+
 ## Tools available (categories; see the repo README for details)
 - core: context7 (current library docs, use instead of memory), sequential-thinking, memory;
   plugins ponytail (minimal-code discipline), code-review, codex bridge (Claude Code only), ECC.
