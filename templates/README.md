@@ -17,7 +17,7 @@ Reusable starting points for any project worked on with AI coding agents (Claude
 | `process/CLEANUP.md` | Closing processes, ports, containers and handoff files that nothing needs |
 | `scripts/check.sh` | Runs every configured check in parallel; prints one short summary |
 | `scripts/run-bg.sh` | Starts a long-running process and registers it so it can be stopped later |
-| `scripts/janitor.sh` | Reports, and on request closes, leftovers |
+| `scripts/janitor.sh` | Reports, and on request closes, this repo's leftovers; `--system` adds a manual machine-wide sweep |
 | `claude/settings.template.json` | Sandbox, permission rules and the cleanup hook for `<repo>/.claude/settings.json` |
 | `claude/agents/reviewer.md` | Read-only, fresh-context reviewer subagent for `<repo>/.claude/agents/` |
 | `ci/gate.yml`, `ci/security.yml` | GitHub Actions starting points for `<repo>/.github/workflows/` |

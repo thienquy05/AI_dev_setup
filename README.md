@@ -91,7 +91,7 @@ AI_dev_setup/
     ├── CLAUDE.template.md          one line that makes Claude Code load AGENTS.md
     ├── gitignore.base              lines every repo needs for agent state, secrets and caches
     ├── process/                    the working process: harness process, PRD templates, testing, review, security gate, cleanup
-    ├── scripts/                    check.sh (parallel checks), run-bg.sh (tracked background processes), janitor.sh (leftovers); tests/ holds selfcheck.sh
+    ├── scripts/                    check.sh (parallel checks), run-bg.sh (tracked background processes), janitor.sh (leftovers); tests/ holds selfcheck.sh and janitor_test.sh
     ├── claude/                     settings.template.json (sandbox and permissions) and agents/reviewer.md (read-only reviewer)
     └── ci/                         GitHub Actions starting points: gate.yml (fast checks) and security.yml
 ```

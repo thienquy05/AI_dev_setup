@@ -24,6 +24,13 @@ owner() {
   echo 0
 }
 
+# Does this pid still belong to the process group it was registered with? A pid can be reused by another
+# process after the first one exits. Where ps is blocked (agent sandbox) this cannot be checked: say yes.
+owns() {  # $1 = pid, $2 = pgid
+  ps -o pgid= -p $$ >/dev/null 2>&1 || return 0
+  [ "$(ps -o pgid= -p "$1" 2>/dev/null | tr -d ' ')" = "$2" ]
+}
+
 stop_group() {
   kill -TERM -- "-$1" 2>/dev/null || return 0
   for _ in 1 2 3 4 5; do kill -0 -- "-$1" 2>/dev/null || return 0; sleep 1; done
@@ -42,7 +49,12 @@ case "${1:-}" in
     name=${2:?usage: run-bg.sh --stop <name>}
     line=$(awk -v n="$name" '$1==n' "$reg")
     [ -n "$line" ] || { echo "run-bg.sh: $name is not registered" >&2; exit 1; }
-    stop_group "$(echo "$line" | awk '{print $3}')"
+    lpid=$(echo "$line" | awk '{print $2}'); lpgid=$(echo "$line" | awk '{print $3}')
+    if kill -0 "$lpid" 2>/dev/null && ! owns "$lpid" "$lpgid"; then
+      echo "run-bg.sh: $name's pid now belongs to another process (reused); nothing was stopped" >&2
+    else
+      stop_group "$lpgid"
+    fi
     awk -v n="$name" '$1!=n' "$reg" >"$reg.tmp" && mv "$reg.tmp" "$reg"
     echo "stopped $name"; exit 0 ;;
 esac

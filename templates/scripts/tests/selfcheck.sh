@@ -35,8 +35,7 @@ check "run-bg.sh --stop ends the process"         '! kill -0 "$pid" 2>/dev/null'
 check "run-bg.sh --stop ends the whole group"     '! kill -0 -- "-$pid" 2>/dev/null'
 check "run-bg.sh --stop unregisters"              '! grep -q "^srv " .handoff/procs'
 
-# janitor.sh (repo-only: never looks at real processes or containers)
-export JANITOR_ONLY_REPO=1
+# janitor.sh (repo-only by default: never looks at real processes or containers)
 check "etime 05:07 = 307 s"                       '[ "$(scripts/janitor.sh --etime-seconds 05:07)" = 307 ]'
 check "etime 01:00:00 = 3600 s"                   '[ "$(scripts/janitor.sh --etime-seconds 01:00:00)" = 3600 ]'
 check "etime 2-03:04:05 = 183845 s"               '[ "$(scripts/janitor.sh --etime-seconds 2-03:04:05)" = 183845 ]'
