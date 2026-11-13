@@ -4,7 +4,7 @@ Goal: agents spend their time fixing problems, not watching test output. Determi
 
 ## 1. The loop
 
-1. Start the checks as a **background task**: `scripts/check.sh` (Claude Code: run it with `run_in_background`; you are notified when it exits). Keep working on something that does not depend on the result.
+1. Run `scripts/check.sh`. If it takes more than ~30 s, start it as a **background task** (Claude Code: `run_in_background`; you are notified when it exits) and keep working on something that does not depend on the result.
 2. `check.sh` reads `scripts/check.cmds`, runs every check in parallel, keeps each full log in `.cache/check/<name>.log`, and prints only `PASS`/`FAIL` per check plus the last lines of each failing log. Exit code is non-zero if anything failed.
 3. When notified, read the summary. Open a full log only for a failing check. Fix, then rerun only that check: `scripts/check.sh <name>`.
 4. At the end of a unit of work, run all checks once more. CI runs them again on the PR.

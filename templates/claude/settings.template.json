@@ -5,8 +5,7 @@
     "autoAllowBashIfSandboxed": true,
     "excludedCommands": ["scripts/janitor.sh"],
     "network": {
-      "allowLocalBinding": true,
-      "allowUnixSockets": ["[HOME]/.docker/run/docker.sock"]
+      "allowLocalBinding": true
     }
   },
   "permissions": {

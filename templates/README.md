@@ -57,7 +57,7 @@ Do not write feature code. Do not install, commit, push or open a pull request u
 2. Copy `AGENTS.template.md` → `AGENTS.md` and `CLAUDE.template.md` → `CLAUDE.md`. Replace every `[PLACEHOLDER]`; delete sections that do not apply; set each tool block ON or OFF.
 3. Copy `process/` → `docs/process/` (or the project's docs folder). Keep section numbers stable; plans refer to them.
 4. Copy `scripts/check.sh`, `scripts/run-bg.sh`, `scripts/janitor.sh`. Write `scripts/check.cmds` for the project's real commands.
-5. Merge `claude/settings.template.json` into `.claude/settings.json` and add `claude/agents/reviewer.md` to `.claude/agents/`. Adjust the sandbox entries to what the project actually needs.
+5. Merge `claude/settings.template.json` into `.claude/settings.json` and add `claude/agents/reviewer.md` to `.claude/agents/`. Adjust the sandbox entries to what the project actually needs. Only a project that must reach Docker from the sandbox (for example harness-os) adds `"allowUnixSockets": ["[HOME]/.docker/run/docker.sock"]` under `sandbox.network`; the Docker socket is close to root access on the machine.
 6. Adapt `ci/*.yml` to the project's stack and copy into `.github/workflows/`. Pin every action to a full commit SHA before use.
 7. Append `gitignore.base` to `.gitignore` (skip lines already present).
 8. Record what was adopted and what was changed in the project's progress file.
