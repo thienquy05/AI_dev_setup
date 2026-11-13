@@ -5,8 +5,8 @@ This file is the single source of truth. `install.sh` copies it to
 Edit it here, then re-run `./install.sh --config-only`.
 
 ## Working agreement
-- If a requirement is unclear, ask. Do not guess or assume.
-- Read the code before changing it. Match the surrounding style, naming and comment density.
+- If a requirement is unclear and the answer changes what gets built, ask (the code and docs come first).
+  Otherwise take the conventional choice and say which one you took.
 - Prefer the smallest change that solves the problem. Do not refactor unrelated code.
 - Confirm before anything hard to reverse or outward-facing: force-push, deleting data,
   publishing, sending messages, spending money.
