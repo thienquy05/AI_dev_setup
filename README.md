@@ -194,7 +194,7 @@ Codex-only install: `./install.sh --codex` (add `--with-connectors` for remote s
 |---|---|---|
 | core | ponytail, ECC, context7, sequential-thinking, memory, shared `AGENTS.md` | `code-review` (Codex has built-in `/review`), `claude-md-management`, `claude-code-setup`, `codex` bridge plugin (Claude Code only), account-synced plugins |
 | dev | playwright, chrome-devtools, token-optimizer, github (with token); vercel via `--with-connectors` | `feature-dev`, `plugin-dev`, `supabase`, `engineering` plugin |
-| design | magic, ui-ux-pro-max skill, hallmark skill pack; excalidraw via `--with-connectors` | `design` plugin |
+| design | magic, ui-ux-pro-max skill, hallmark skill pack, modern-web-guidance; excalidraw via `--with-connectors` | `design` plugin |
 | video | remotion skill pack | `ffmpeg-llm`, `watch-video`, `video-to-code-skill` (claude.ai account only) |
 | audio | elevenlabs via `--with-connectors` | `transcribe-so` plugin |
 | docs | pdf; claude-docs, google-drive, goodnotes via `--with-connectors` | `pdf-viewer`, Anthropic built-in skills |
@@ -235,6 +235,8 @@ claude mcp add --scope user magic -- npx -y @magicuidesign/mcp@latest
 claude plugin marketplace add nextlevelbuilder/ui-ux-pro-max-skill
 claude plugin install ui-ux-pro-max@ui-ux-pro-max-skill --scope user
 npx -y skills add nutlope/hallmark -g -a claude-code -s '*' -y
+claude plugin marketplace add GoogleChrome/modern-web-guidance
+claude plugin install modern-web-guidance@googlechrome --scope user
 
 # video
 npx -y skills add remotion-dev/skills -g -a claude-code -s '*' -y
@@ -280,6 +282,7 @@ codex mcp add github --env GITHUB_PERSONAL_ACCESS_TOKEN=ghp_xxx -- npx -y @model
 codex mcp add magic -- npx -y @magicuidesign/mcp@latest
 npx -y ui-ux-pro-max-cli init --ai universal --global   # installs the skill into ~/.agents/skills/ (read by Codex)
 npx -y skills add nutlope/hallmark -g -a codex -s '*' -y
+codex plugin marketplace add GoogleChrome/modern-web-guidance && codex plugin add modern-web-guidance@googlechrome
 
 # agents
 codex mcp add ruflo -- npx -y ruflo@latest mcp start
@@ -310,7 +313,7 @@ Items that only work once present in a config file. `install.sh` writes them; ma
 | Key | Purpose |
 |---|---|
 | `enabledPlugins` | enables `ponytail@ponytail`, `code-review@claude-plugins-official`, `codex@openai-codex`, `ecc@ecc`; plugins from other categories are enabled by `claude plugin install` |
-| `extraKnownMarketplaces` | declares marketplaces: ponytail, anthropic-agent-skills, ecc, openai-codex, ruflo, ui-ux-pro-max-skill |
+| `extraKnownMarketplaces` | declares marketplaces: ponytail, anthropic-agent-skills, ecc, openai-codex, ruflo, ui-ux-pro-max-skill, googlechrome |
 | `sandbox.excludedCommands` | `["codex"]`, lets the Codex plugin run outside the sandbox |
 | `model`, `effortLevel` | defaults `opus` / `high`, applied only when unset |
 
