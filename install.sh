@@ -38,8 +38,6 @@ core|cplugin|ponytail@ponytail|
 core|cmarket|ecc|affaan-m/ECC
 core|cplugin|ecc@ecc|
 core|mcp|context7|npx -y @upstash/context7-mcp@latest
-core|mcp|sequential-thinking|npx -y @modelcontextprotocol/server-sequential-thinking
-core|mcp|memory|npx -y @modelcontextprotocol/server-memory
 dev|plugin|feature-dev@claude-plugins-official|
 dev|plugin|plugin-dev@claude-plugins-official|
 dev|plugin|supabase@claude-plugins-official|
@@ -70,7 +68,6 @@ agents|plugin|ruflo-mods@ruflo|
 agents|cmcp|ruflo|npx -y ruflo@latest mcp start
 security|plugin|security-guidance@claude-plugins-official|
 security|plugin|claude-security@claude-plugins-official|
-security|mcp|rea|npx -y rea-agents@6.5.0 mcp
 '
 
 DO_CLAUDE=1; DO_CODEX=1
