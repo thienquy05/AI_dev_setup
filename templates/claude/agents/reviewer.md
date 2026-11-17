@@ -22,5 +22,3 @@ Report each finding as:
 - `file:line` · severity (critical / high / medium / low) · what is wrong · a concrete failure scenario (input → wrong result) · the smallest fix.
 
 A concern without a failure scenario is a question; list questions separately. If nothing survives scrutiny, say "no findings" and list what you checked. Do not edit files.
-
-Model: the default is Opus. The caller may choose Sonnet for a small, low-risk diff (docs, renames, mechanical changes).

@@ -62,10 +62,10 @@ Do not write feature code. Do not install, commit, push or open a pull request u
 7. Append `gitignore.base` to `.gitignore` (skip lines already present).
 8. Record what was adopted and what was changed in the project's progress file.
 
-Installing any tool: use the owner's `AI_dev_setup` repository (`./install.sh --list`, then the right category flag) or the tool's official repository, with the owner's approval.
+Installing any tool: use the owner's `AI_dev_setup` repository (https://github.com/thienquy05/AI_dev_setup; `./install.sh --list`, then the right category flag) or the tool's official repository, with the owner's approval.
 
 ## Rules for editing these templates
 
 - Keep them general. If a rule only makes sense for one project, it belongs in that project's `AGENTS.md` or PRD.
-- No real names, account names, absolute home paths, ports or secrets.
+- No real names, account names, absolute home paths, ports or secrets. The one exception is the owner's `AI_dev_setup` repository URL.
 - When a project improves a template, bring the improvement back here in general form.

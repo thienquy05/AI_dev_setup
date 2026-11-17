@@ -1,7 +1,5 @@
 # PRD template for research / ML projects
 
-Derived from a general product-PRD reference. Kept: executive summary, problem, scope, requirements, risks, timeline, open questions. Removed: market sizing, go-to-market, pricing, budget, wireframes. Added: data specification, modeling and evaluation, execution environment, privacy, acceptance checklist.
-
 Copy this file to `docs/PRD.md` in a new project and delete what does not apply. Keep section numbers stable because plans and prompts refer to them.
 
 ## Header
