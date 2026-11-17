@@ -31,11 +31,11 @@ Edit it here, then re-run `./install.sh --config-only`.
 - Existing projects keep their own `AGENTS.md`; do not apply the templates unasked.
 
 ## Tools available (categories; see the repo README for details)
-- core: context7 (current library docs, when an API or version may differ from what you know), sequential-thinking, memory;
+- core: context7 (current library docs, when an API or version may differ from what you know);
   plugins ponytail (minimal-code discipline), code-review, codex bridge (Claude Code only), ECC.
 - dev: playwright (real Chrome), chrome-devtools (via ECC), token-optimizer, github, vercel.
 - design: magic (UI components), ui-ux-pro-max (UI/UX rules), modern-web-guidance (current HTML/CSS/client-JS platform patterns; search first for web UI work), excalidraw (diagrams), design plugin skills.
-- agents: ruflo (swarms, orchestration). security: rea (reverse engineering; authorized targets only).
+- agents: ruflo (swarms, orchestration).
 - video / audio: remotion (React video, skill pack), ffmpeg-llm, watch-video, transcribe-so, ElevenLabs.
 - docs: pdf, Claude Docs, Google Drive, docx/pdf/pptx/xlsx skills.
 - Only use a tool that is actually connected in the current session; do not assume the full list is present.

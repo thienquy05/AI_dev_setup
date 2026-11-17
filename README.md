@@ -110,8 +110,6 @@ Installer column: **script** = installed by `install.sh`; **account** = synced f
 | claude-md-management | plugin, `claude-plugins-official` | script (Claude Code) | Audits and improves `CLAUDE.md` files and captures session learnings into them. |
 | claude-code-setup | plugin, `claude-plugins-official` | script (Claude Code) | Analyzes a codebase and recommends Claude Code automations (hooks, skills, MCP servers, subagents). |
 | context7 | MCP, `@upstash/context7-mcp` | script | Current, version-specific library documentation. |
-| sequential-thinking | MCP, `@modelcontextprotocol/server-sequential-thinking` | script | Stepwise reasoning tool for planning and debugging. |
-| memory | MCP, `@modelcontextprotocol/server-memory` | script | Knowledge-graph memory persisted across sessions. |
 | anthropic-agent-skills | marketplace, [anthropics/skills](https://github.com/anthropics/skills) | script (registered only) | Optional skill packs: `/plugin install document-skills@anthropic-agent-skills`, `/plugin install example-skills@anthropic-agent-skills`. |
 | cowork-plugin-management | plugin | account | Create and customize plugins. |
 | ECC | plugin `ecc@ecc`, [affaan-m/ECC](https://github.com/affaan-m/ECC) | script (Claude Code + Codex); skip with `--no-ecc` | Everything Claude Code: agents, skills, command shims, hooks, rules, memory/continuous learning and AgentShield scanning of prompts, hooks and MCP config. Also provides the `chrome-devtools` MCP (`npx -y chrome-devtools-mcp`, Chrome DevTools debugging and performance traces) as `plugin:ecc:chrome-devtools`. Do not combine with a manual ECC install; the install may print a note that `package.json` overrides were not applied, which does not affect the plugin. |
@@ -182,7 +180,6 @@ Installer column: **script** = installed by `install.sh`; **account** = synced f
 
 | Tool | Type | Installer | Purpose |
 |---|---|---|---|
-| rea | MCP, `rea-agents@6.5.0 mcp` ([morluto/rea](https://github.com/morluto/rea)) | script | Reverse-engineering toolkit for native binaries, JavaScript/Electron apps, .NET assemblies and websites, using local Hopper, Ghidra or IDA when available. Use only on software you are authorized to analyze. `npx rea-agents setup` additionally registers workflow instructions with each agent. Version pinned to match the original setup (latest published: 6.7.0). |
 | security-guidance | plugin, `claude-plugins-official` | script (Claude Code) | Hook that warns about security issues (injection, XSS, unsafe patterns) when files are edited. |
 | claude-security | plugin, `claude-plugins-official` | script (Claude Code) | `/claude-security`: multi-stage security scan of a codebase or change (threat model, research, adversarial review). |
 
@@ -192,14 +189,14 @@ Codex-only install: `./install.sh --codex` (add `--with-connectors` for remote s
 
 | Category | Installed for Codex | Not available for Codex |
 |---|---|---|
-| core | ponytail, ECC, context7, sequential-thinking, memory, shared `AGENTS.md` | `code-review` (Codex has built-in `/review`), `claude-md-management`, `claude-code-setup`, `codex` bridge plugin (Claude Code only), account-synced plugins |
+| core | ponytail, ECC, context7, shared `AGENTS.md` | `code-review` (Codex has built-in `/review`), `claude-md-management`, `claude-code-setup`, `codex` bridge plugin (Claude Code only), account-synced plugins |
 | dev | playwright, chrome-devtools, token-optimizer, github (with token); vercel via `--with-connectors` | `feature-dev`, `plugin-dev`, `supabase`, `engineering` plugin |
 | design | magic, ui-ux-pro-max skill, hallmark skill pack, modern-web-guidance; excalidraw via `--with-connectors` | `design` plugin |
 | video | remotion skill pack | `ffmpeg-llm`, `watch-video`, `video-to-code-skill` (claude.ai account only) |
 | audio | elevenlabs via `--with-connectors` | `transcribe-so` plugin |
 | docs | pdf; claude-docs, google-drive, goodnotes via `--with-connectors` | `pdf-viewer`, Anthropic built-in skills |
 | agents | ruflo MCP | `ruflo-core`, `ruflo-console`, `ruflo-mods` (Claude Code mods) |
-| security | rea | `security-guidance`, `claude-security` (Claude Code plugins) |
+| security | (none) | `security-guidance`, `claude-security` (Claude Code plugins) |
 
 Remote servers use OAuth. Some were issued for claude.ai and may refuse authorization from Codex; failures are reported at the end of the run.
 
@@ -219,8 +216,6 @@ claude plugin install codex@openai-codex --scope user
 claude plugin install claude-md-management@claude-plugins-official --scope user
 claude plugin install claude-code-setup@claude-plugins-official --scope user
 claude mcp add --scope user context7 -- npx -y @upstash/context7-mcp@latest
-claude mcp add --scope user sequential-thinking -- npx -y @modelcontextprotocol/server-sequential-thinking
-claude mcp add --scope user memory -- npx -y @modelcontextprotocol/server-memory
 
 # dev
 claude mcp add --scope user token-optimizer -- npx -y token-optimizer-mcp
@@ -248,7 +243,6 @@ claude plugin install ruflo-console@ruflo --scope user
 claude plugin install ruflo-mods@ruflo --scope user
 
 # security
-claude mcp add --scope user rea -- npx -y rea-agents@6.5.0 mcp
 claude plugin install security-guidance@claude-plugins-official --scope user
 claude plugin install claude-security@claude-plugins-official --scope user
 
@@ -268,8 +262,6 @@ Verify: `claude plugin list`, `claude mcp list`.
 codex plugin marketplace add DietrichGebert/ponytail
 codex plugin add ponytail@ponytail
 codex mcp add context7 -- npx -y @upstash/context7-mcp@latest
-codex mcp add sequential-thinking -- npx -y @modelcontextprotocol/server-sequential-thinking
-codex mcp add memory -- npx -y @modelcontextprotocol/server-memory
 codex plugin marketplace add affaan-m/ECC && codex plugin add ecc@ecc
 
 # dev
@@ -288,7 +280,6 @@ codex plugin marketplace add GoogleChrome/modern-web-guidance && codex plugin ad
 codex mcp add ruflo -- npx -y ruflo@latest mcp start
 
 # security
-codex mcp add rea -- npx -y rea-agents@6.5.0 mcp
 
 # video
 npx -y skills add remotion-dev/skills -g -a codex -s '*' -y
