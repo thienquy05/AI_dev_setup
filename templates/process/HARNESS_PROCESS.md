@@ -6,7 +6,7 @@ Companion files: [PRD_TEMPLATE.md](PRD_TEMPLATE.md) (research/ML), [PRD_TEMPLATE
 
 ## 1. Tools and what they do
 
-Install tools from the owner's `AI_dev_setup` repository or the tool's official repository, with approval. Before relying on a tool, check on the machine that it is installed and which version (`claude plugin list`, `claude mcp list`, `docker ps`).
+Install tools from the owner's `AI_dev_setup` repository (https://github.com/thienquy05/AI_dev_setup) or the tool's official repository, with approval. Before relying on a tool, check on the machine that it is installed and which version (`claude plugin list`, `claude mcp list`, `docker ps`).
 
 | Tool | What it is | Notes |
 |---|---|---|

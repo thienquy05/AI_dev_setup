@@ -23,10 +23,10 @@ Loaded by every agent at session start (Claude Code through `CLAUDE.md` → `@AG
 - Reviews are done by a fresh-context reviewer, never by the agent that wrote the change (`docs/process/REVIEW.md`).
 
 ## 3. Restricted rules
-1. **Installs and downloads.** Before installing a package or tool, or running `npx …@latest`, state the exact source (official publisher, HTTPS) and why, and wait for approval. Use the owner's `AI_dev_setup` repo or the tool's official repository. Pin versions once approved. Project-local installs only.
+1. **Installs and downloads.** Before installing a package or tool, or running `npx …@latest`, state the exact source (official publisher, HTTPS) and why, and wait for approval. Use the owner's `AI_dev_setup` repo (https://github.com/thienquy05/AI_dev_setup) or the tool's official repository. Pin versions once approved. Project-local installs only.
 2. **Git.** Work on a branch: `<feat|fix|chore|docs>/<topic>`. Never commit to the default branch. Commit, push or open a PR only when the owner asks in that moment; earlier approval does not carry over. No force-push.
 3. **Privacy.** No real names, emails, account IDs, absolute home paths, tokens, secrets or personal data in git, docs, fixtures, screenshots, logs or text sent to another tool. Use placeholders (`[USER]`, `~`). Secrets live in git-ignored `.env`; commit `.env.example`.
-4. **Do not guess at requirements.** Ask when the answer changes what gets built and the repo or PRD does not answer it; otherwise take the conventional choice and state it. Open product questions go to the PRD open-questions table with a proposed default. Estimates are marked `~`.
+4. **Ask before working; do not guess or assume.** Before starting, make sure the task is clear. If the repo or PRD does not answer a question, ask the owner instead of picking a default yourself. Open product questions go to the PRD open-questions table with a proposed default. Estimates are marked `~`.
 
 ## 4. Autonomy: act, or flag
 Act without asking when **all** hold: the action is reversible, stays on this machine, installs nothing new and sends nothing to the internet. If any is uncertain, say so in one line and ask. Prefer the sandbox; when a command fails because of the sandbox, use a narrow allowance from `.claude/settings.json` rather than running unsandboxed (outside the sandbox there is no network restriction). Destructive git, pushes, deploys, migrations on shared data and installs always ask.
