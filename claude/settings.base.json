@@ -49,6 +49,12 @@
         "source": "github",
         "repo": "GoogleChrome/modern-web-guidance"
       }
+    },
+    "heydamir": {
+      "source": {
+        "source": "github",
+        "repo": "heydamir/unslop"
+      }
     }
   },
   "sandbox": {

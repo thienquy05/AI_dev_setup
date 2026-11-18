@@ -34,7 +34,10 @@ Edit it here, then re-run `./install.sh --config-only`.
 - core: context7 (current library docs, when an API or version may differ from what you know);
   plugins ponytail (minimal-code discipline), code-review, codex bridge (Claude Code only), ECC.
 - dev: playwright (real Chrome), chrome-devtools (via ECC), token-optimizer, github, vercel.
-- design: magic (UI components), ui-ux-pro-max (UI/UX rules), modern-web-guidance (current HTML/CSS/client-JS platform patterns; search first for web UI work), excalidraw (diagrams), design plugin skills.
+- design: magic (UI components), ui-ux-pro-max (UI/UX rules), modern-web-guidance (current HTML/CSS/client-JS platform patterns; search first for web UI work), hallmark (new pages), unslop (existing UI that looks AI-generated), figma (Figma files), excalidraw (diagrams), design plugin skills.
+  Which design skill to use: a new page or site → hallmark; restyling an existing screen → unslop
+  (hallmark only when the user names it, e.g. `/hallmark redesign`); reading or editing a Figma file → figma.
+  One design skill per task: do not stack their visual rules, since they disagree on details.
 - agents: ruflo (swarms, orchestration).
 - video / audio: remotion (React video, skill pack), ffmpeg-llm, watch-video, transcribe-so, ElevenLabs.
 - docs: pdf, Claude Docs, Google Drive, docx/pdf/pptx/xlsx skills.
