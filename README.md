@@ -36,6 +36,8 @@ export GITHUB_PERSONAL_ACCESS_TOKEN=ghp_xxx   # optional, enables the github MCP
 | Claude Code 2.1.287+ | `agents` category (ruflo mods) | `claude update` |
 | Python 3 | `ui-ux-pro-max` search scripts | `brew install python` |
 | ffmpeg, yt-dlp (video category) | `ffmpeg-llm`, `watch-video` | `brew install ffmpeg yt-dlp` |
+| Playwright npm package, ffmpeg (optional) | `unslop` live-site snapshots and story videos (run in the project) | `npm install -D playwright && npx playwright install chromium` |
+| Figma Dev or Full seat (optional) | `figma` MCP beyond 6 tool calls a month | https://www.figma.com/pricing |
 
 ## 2. Installer usage
 
@@ -134,7 +136,10 @@ Installer column: **script** = installed by `install.sh`; **account** = synced f
 |---|---|---|---|
 | magic | MCP, `@magicuidesign/mcp` | script | Magic UI component library: look up and generate animated React/Tailwind components. |
 | ui-ux-pro-max | plugin, [nextlevelbuilder/ui-ux-pro-max-skill](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) | script (Claude Code) | UI/UX design intelligence skill: searchable databases of 79 styles, 192 palettes, 74 font pairings, 25 chart types and 22 stack guidelines (React, Next.js, Vue, Svelte, SwiftUI, Flutter, Tailwind, shadcn/ui and others). Requires Python 3. Codex: installed by the script as a skill in `~/.agents/skills/` (`npx -y ui-ux-pro-max-cli init --ai universal --global`). |
-| hallmark | skill, [nutlope/hallmark](https://github.com/nutlope/hallmark) (MIT, by Together AI) | script (Claude Code + Codex, user scope) | Anti-AI-slop design skill for building new pages. Deals three themes from a catalogue of 50, builds the page around the visitor's job, then lints it in a real browser (`sloplint --render`: contrast, focus rings, phone layout, invented facts, empty frames) and has a fresh-context reviewer sign off. `/hallmark <prompt>` (Codex: `$hallmark`), `/hallmark redesign <path>` (keeps content and wiring), `/hallmark audit <path>` (report only), or say *custom* to drop the themes. Output is self-contained HTML/CSS and is not framework-aware by default. Optional extras: browser checks need `npm i -g puppeteer-core` and Chrome; AI image generation needs `TOGETHER_API_KEY` (not set up here). Only invoked on new designs or when named, so it does not touch existing pages unprompted. |
+| hallmark | skill, [nutlope/hallmark](https://github.com/nutlope/hallmark) (MIT, by Together AI) | script (Claude Code + Codex, user scope) | Anti-AI-slop design skill for building new pages. Deals three themes from a catalogue of 50, builds the page around the visitor's job, then lints it in a real browser (`sloplint --render`: contrast, focus rings, phone layout, invented facts, empty frames) and has a fresh-context reviewer sign off. `/hallmark <prompt>` (Codex: `$hallmark`), `/hallmark redesign <path>` (keeps content and wiring), `/hallmark audit <path>` (report only), or say *custom* to drop the themes. Output is self-contained HTML/CSS and is not framework-aware by default. Optional extras: browser checks need `npm i -g puppeteer-core` and Chrome; AI image generation needs `TOGETHER_API_KEY` (not set up here). Only invoked on new designs or when named, so it does not touch existing pages unprompted; use `unslop` for existing screens. |
+| modern-web-guidance | plugin, [GoogleChrome/modern-web-guidance](https://github.com/GoogleChrome/modern-web-guidance) | script (Claude Code + Codex) | Searchable guidance on current HTML, CSS and client-side JS platform patterns (dialogs, popovers, forms, view transitions, Core Web Vitals). Technical only; it sets no visual style. |
+| unslop | plugin `unslop@heydamir`, [heydamir/unslop](https://github.com/heydamir/unslop) (CC BY 4.0) | script (Claude Code: plugin; Codex: skill in `~/.agents/skills/`) | Restyles an **existing** screen that looks AI-generated. Audits it against a list of tells (purple gradients, glows, emoji icons, tracked-caps labels, uneven spacing), proposes a five-line direction and waits for approval, then fixes it in nine passes: spacing, color, icons, copy, type, layout, details, visuals, motion. Keeps the product's sections and content. `/unslop <screen or URL>` (Codex: `$unslop`). Works in the project's own stack. Live-site snapshots and the optional story video need the Playwright npm package in the project, and the video also needs ffmpeg (section 1). The license requires crediting the author; story videos carry a credit. If an old copy sits in `~/.claude/skills/unslop`, delete it or it shadows the plugin. |
+| figma | plugin `figma@claude-plugins-official` (official, [figma/mcp-server-guide](https://github.com/figma/mcp-server-guide)); remote MCP `https://mcp.figma.com/mcp` | script (Claude Code: plugin; Codex: `--with-connectors`) | Figma's own MCP server: reads designs into code (`get_design_context` as React + Tailwind, `get_variable_defs`, `get_screenshot`, `get_metadata`) and writes to the canvas (free during the beta). Authorize on first use. **Limits:** Starter plans and View/Collab seats get 6 tool calls a month; Dev/Full seats on paid plans get per-minute limits. The account-synced `design` plugin also bundles a Figma connector (`plugin:design:figma`) pointing at the same server; keep one of them enabled to avoid duplicate tools. |
 | excalidraw | remote MCP, `https://mcp.excalidraw.com/mcp` | account (Claude Code), script `--with-connectors` (Codex) | Create diagrams and whiteboard drawings. |
 | design | plugin | account | Skills: accessibility-review (WCAG 2.1 AA), design-critique, design-handoff, design-system, research-synthesis, user-research, ux-copy. Bundles connectors for Figma, Asana, Intercom, Linear, Notion, Slack, Atlassian (each needs authorization). |
 
@@ -191,7 +196,7 @@ Codex-only install: `./install.sh --codex` (add `--with-connectors` for remote s
 |---|---|---|
 | core | ponytail, ECC, context7, shared `AGENTS.md` | `code-review` (Codex has built-in `/review`), `claude-md-management`, `claude-code-setup`, `codex` bridge plugin (Claude Code only), account-synced plugins |
 | dev | playwright, chrome-devtools, token-optimizer, github (with token); vercel via `--with-connectors` | `feature-dev`, `plugin-dev`, `supabase`, `engineering` plugin |
-| design | magic, ui-ux-pro-max skill, hallmark skill pack, modern-web-guidance; excalidraw via `--with-connectors` | `design` plugin |
+| design | magic, ui-ux-pro-max skill, hallmark skill pack, modern-web-guidance, unslop skill; figma, excalidraw via `--with-connectors` | `design` plugin |
 | video | remotion skill pack | `ffmpeg-llm`, `watch-video`, `video-to-code-skill` (claude.ai account only) |
 | audio | elevenlabs via `--with-connectors` | `transcribe-so` plugin |
 | docs | pdf; claude-docs, google-drive, goodnotes via `--with-connectors` | `pdf-viewer`, Anthropic built-in skills |
@@ -232,6 +237,9 @@ claude plugin install ui-ux-pro-max@ui-ux-pro-max-skill --scope user
 npx -y skills add nutlope/hallmark -g -a claude-code -s '*' -y
 claude plugin marketplace add GoogleChrome/modern-web-guidance
 claude plugin install modern-web-guidance@googlechrome --scope user
+claude plugin marketplace add heydamir/unslop
+claude plugin install unslop@heydamir --scope user
+claude plugin install figma@claude-plugins-official --scope user
 
 # video
 npx -y skills add remotion-dev/skills -g -a claude-code -s '*' -y
@@ -275,6 +283,8 @@ codex mcp add magic -- npx -y @magicuidesign/mcp@latest
 npx -y ui-ux-pro-max-cli init --ai universal --global   # installs the skill into ~/.agents/skills/ (read by Codex)
 npx -y skills add nutlope/hallmark -g -a codex -s '*' -y
 codex plugin marketplace add GoogleChrome/modern-web-guidance && codex plugin add modern-web-guidance@googlechrome
+npx -y skills add heydamir/unslop -g -a codex -s unslop -y   # installs the skill into ~/.agents/skills/
+codex mcp add figma --url https://mcp.figma.com/mcp && codex mcp login figma
 
 # agents
 codex mcp add ruflo -- npx -y ruflo@latest mcp start
@@ -304,7 +314,7 @@ Items that only work once present in a config file. `install.sh` writes them; ma
 | Key | Purpose |
 |---|---|
 | `enabledPlugins` | enables `ponytail@ponytail`, `code-review@claude-plugins-official`, `codex@openai-codex`, `ecc@ecc`; plugins from other categories are enabled by `claude plugin install` |
-| `extraKnownMarketplaces` | declares marketplaces: ponytail, anthropic-agent-skills, ecc, openai-codex, ruflo, ui-ux-pro-max-skill, googlechrome |
+| `extraKnownMarketplaces` | declares marketplaces: ponytail, anthropic-agent-skills, ecc, openai-codex, ruflo, ui-ux-pro-max-skill, googlechrome, heydamir |
 | `sandbox.excludedCommands` | `["codex"]`, lets the Codex plugin run outside the sandbox |
 | `model`, `effortLevel` | defaults `opus` / `high`, applied only when unset |
 

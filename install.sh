@@ -54,6 +54,11 @@ design|market|googlechrome|GoogleChrome/modern-web-guidance
 design|plugin|modern-web-guidance@googlechrome|
 design|cmarket|googlechrome|GoogleChrome/modern-web-guidance
 design|cplugin|modern-web-guidance@googlechrome|
+design|market|heydamir|heydamir/unslop
+design|plugin|unslop@heydamir|
+design|cskill|unslop|npx -y skills add heydamir/unslop -g -a codex -s unslop -y
+design|plugin|figma@claude-plugins-official|
+design|remote|figma|https://mcp.figma.com/mcp
 design|remote|excalidraw|https://mcp.excalidraw.com/mcp
 video|agentskill|remotion|remotion-dev/skills
 audio|remote|elevenlabs|https://api.elevenlabs.io/v1/mcp
