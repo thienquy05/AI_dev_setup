@@ -27,12 +27,11 @@ export GITHUB_PERSONAL_ACCESS_TOKEN=ghp_xxx   # optional, enables the github MCP
 
 | Requirement | Used for | Install |
 |---|---|---|
-| Node.js 18.18+ (`node`, `npx`) | MCP servers launched via `npx`; settings merge | `brew install node` |
+| Node.js 24 LTS, 24.11+ (22.20+ also works) (`node`, `npx`) | MCP servers launched via `npx`; settings merge; `skills` CLI for the Remotion and Hallmark skill packs | `brew install node` |
 | Claude Code CLI | `claude plugin`, `claude mcp` | https://docs.claude.com/en/docs/claude-code |
 | Codex CLI | `codex plugin`, `codex mcp` (the Codex app and IDE extension read the same `~/.codex/config.toml`) | `npm install -g @openai/codex`, then `codex login` |
 | Google Chrome | `playwright` MCP (`--browser chrome`) | `brew install --cask google-chrome` |
 | GitHub token (optional) | `github` MCP | https://github.com/settings/tokens |
-| Node.js 22.20+ | `skills` CLI used for the Remotion and Hallmark skill packs | `brew install node` |
 | Claude Code 2.1.287+ | `agents` category (ruflo mods) | `claude update` |
 | Python 3 | `ui-ux-pro-max` search scripts | `brew install python` |
 | ffmpeg, yt-dlp (video category) | `ffmpeg-llm`, `watch-video` | `brew install ffmpeg yt-dlp` |
@@ -124,9 +123,9 @@ Installer column: **script** = installed by `install.sh`; **account** = synced f
 | feature-dev | plugin, `claude-plugins-official` | script (Claude Code) | `/feature-dev`: guided feature development with codebase exploration, architecture design and review agents. |
 | plugin-dev | plugin, `claude-plugins-official` | script (Claude Code) | Toolkit for building Claude Code plugins: skills for hooks, MCP integration, commands, agents and plugin structure. |
 | supabase | plugin, `claude-plugins-official` | script (Claude Code) | Supabase MCP integration: manage databases, auth, storage and edge functions (needs authorization). |
-| token-optimizer | MCP, `token-optimizer-mcp` | script | Context-window optimization: stores large content externally with caching and compression so it does not occupy the context. |
-| chrome-devtools | MCP, `chrome-devtools-mcp@1.10.1` | Claude Code: bundled with ECC; Codex: script | Chrome DevTools debugging and performance traces. |
-| github | MCP, `@modelcontextprotocol/server-github` | script, needs `GITHUB_PERSONAL_ACCESS_TOKEN` | Repositories, issues, pull requests, code search. The npm package is no longer actively developed; maintained alternative: https://github.com/github/github-mcp-server. |
+| token-optimizer | MCP, `@ooples/token-optimizer-mcp` | script | Context-window optimization: stores large content externally with caching and compression so it does not occupy the context. |
+| chrome-devtools | MCP, `chrome-devtools-mcp@1.13.0` | Claude Code: bundled with ECC (ECC pins 1.10.1); Codex: script | Chrome DevTools debugging and performance traces. |
+| github | remote MCP, [github/github-mcp-server](https://github.com/github/github-mcp-server) (`https://api.githubcopilot.com/mcp/`) | script, needs `GITHUB_PERSONAL_ACCESS_TOKEN` | Repositories, issues, pull requests, code search. Codex reads the token from the environment at launch, so keep `GITHUB_PERSONAL_ACCESS_TOKEN` exported. |
 | vercel | remote MCP, `https://mcp.vercel.com` | account (Claude Code), script `--with-connectors` (Codex) | Deployments, logs, projects, domains, environment variables. |
 | engineering | plugin | account | Skills: architecture, code-review, debug, deploy-checklist, documentation, incident-response, standup, system-design, tech-debt, testing-strategy. Bundles connectors for Slack, Linear, Atlassian, Notion, Datadog, PagerDuty, GitHub (each needs authorization). |
 
@@ -223,9 +222,9 @@ claude plugin install claude-code-setup@claude-plugins-official --scope user
 claude mcp add --scope user context7 -- npx -y @upstash/context7-mcp@latest
 
 # dev
-claude mcp add --scope user token-optimizer -- npx -y token-optimizer-mcp
+claude mcp add --scope user token-optimizer -- npx -y @ooples/token-optimizer-mcp@latest
 claude mcp add --scope user playwright -- npx -y @playwright/mcp --browser chrome
-claude mcp add --scope user github -e GITHUB_PERSONAL_ACCESS_TOKEN=ghp_xxx -- npx -y @modelcontextprotocol/server-github
+claude mcp add --scope user --transport http github https://api.githubcopilot.com/mcp/ -H "Authorization: Bearer ghp_xxx"
 claude plugin install feature-dev@claude-plugins-official --scope user
 claude plugin install plugin-dev@claude-plugins-official --scope user
 claude plugin install supabase@claude-plugins-official --scope user
@@ -273,10 +272,10 @@ codex mcp add context7 -- npx -y @upstash/context7-mcp@latest
 codex plugin marketplace add affaan-m/ECC && codex plugin add ecc@ecc
 
 # dev
-codex mcp add chrome-devtools -- npx -y chrome-devtools-mcp@1.10.1
-codex mcp add token-optimizer -- npx -y token-optimizer-mcp
+codex mcp add chrome-devtools -- npx -y chrome-devtools-mcp@1.13.0
+codex mcp add token-optimizer -- npx -y @ooples/token-optimizer-mcp@latest
 codex mcp add playwright -- npx -y @playwright/mcp --browser chrome
-codex mcp add github --env GITHUB_PERSONAL_ACCESS_TOKEN=ghp_xxx -- npx -y @modelcontextprotocol/server-github
+codex mcp add github --url https://api.githubcopilot.com/mcp/ --bearer-token-env-var GITHUB_PERSONAL_ACCESS_TOKEN
 
 # design
 codex mcp add magic -- npx -y @magicuidesign/mcp@latest
