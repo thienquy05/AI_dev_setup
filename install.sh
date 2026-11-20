@@ -42,8 +42,8 @@ dev|plugin|feature-dev@claude-plugins-official|
 dev|plugin|plugin-dev@claude-plugins-official|
 dev|plugin|supabase@claude-plugins-official|
 dev|mcp|playwright|npx -y @playwright/mcp --browser chrome
-dev|mcp|token-optimizer|npx -y token-optimizer-mcp
-dev|cmcp|chrome-devtools|npx -y chrome-devtools-mcp@1.10.1
+dev|mcp|token-optimizer|npx -y @ooples/token-optimizer-mcp@latest
+dev|cmcp|chrome-devtools|npx -y chrome-devtools-mcp@1.13.0
 dev|remote|vercel|https://mcp.vercel.com
 design|mcp|magic|npx -y @magicuidesign/mcp@latest
 design|market|ui-ux-pro-max-skill|nextlevelbuilder/ui-ux-pro-max-skill
@@ -199,7 +199,7 @@ claude_setup() {
     case " $SELECTED " in *" dev "*)
       if [ -n "${GITHUB_PERSONAL_ACCESS_TOKEN:-}" ]; then
         grep -q "^github:" <<<"$existing" || \
-          run claude mcp add --scope user github -e GITHUB_PERSONAL_ACCESS_TOKEN="$GITHUB_PERSONAL_ACCESS_TOKEN" -- npx -y @modelcontextprotocol/server-github
+          run claude mcp add --scope user --transport http github https://api.githubcopilot.com/mcp/ -H "Authorization: Bearer $GITHUB_PERSONAL_ACCESS_TOKEN"
       else echo "skip github MCP: export GITHUB_PERSONAL_ACCESS_TOKEN and re-run"; fi ;;
     esac
   fi
@@ -248,7 +248,7 @@ codex_setup() {
     case " $SELECTED " in *" dev "*)
       if [ -n "${GITHUB_PERSONAL_ACCESS_TOKEN:-}" ]; then
         grep -qE "^github( |\$)" <<<"$existing" || \
-          run codex mcp add github --env GITHUB_PERSONAL_ACCESS_TOKEN="$GITHUB_PERSONAL_ACCESS_TOKEN" -- npx -y @modelcontextprotocol/server-github
+          run codex mcp add github --url https://api.githubcopilot.com/mcp/ --bearer-token-env-var GITHUB_PERSONAL_ACCESS_TOKEN
       fi ;;
     esac
     if [ "$WITH_CONNECTORS" = 1 ]; then
@@ -277,7 +277,7 @@ codex_setup() {
   return 0
 }
 
-# Skill packs installed with the `skills` CLI (needs Node 22.20+). One call targets whichever tools are selected.
+# Skill packs installed with the `skills` CLI (needs Node 22.20+; Node 24 LTS recommended). One call targets whichever tools are selected.
 skillpacks_setup() {
   [ "$DO_PLUGINS" = 1 ] || return 0
   local sname srepo agents=""
